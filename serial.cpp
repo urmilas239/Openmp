@@ -44,7 +44,7 @@ int main( int argc, char **argv )
     set_size( n );
 
     //call the function to set bin variables
-    set_bin_count();
+    set_bin_count(n);
     bin_map = initialize_bin_vector();
     initialize_neighbor_bins();
     init_particles( n, particles );

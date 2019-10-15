@@ -28,7 +28,7 @@ typedef struct
 
 //Added 
 
- void set_bin_count();
+ void set_bin_count(int n);
  int compute_bin_index_from_xy(int x, int y, int bin_size);
  std::vector<std::vector<int>> initialize_neighbor_bins();
 std::vector<std::vector<int>> initialize_bin_vector();

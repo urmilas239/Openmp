@@ -143,7 +143,7 @@ std::vector<std::vector<int>> initialize_neighbor_bins()
 /*
  * Set number of bins
  */
- void set_bin_count()
+ void set_bin_count(int n)
  {
     num_of_bins_x = ceil(size/min_r);
     num_of_bins_y = num_of_bins_x;
