@@ -163,7 +163,48 @@ std::vector<std::vector<int>> initialize_neighbor_bins()
 //
 //  Initialize the particle positions and velocities
 //
-void init_particles( int n, particle_t *p ,  std::vector<std::vector<int>> &bin_map)
+void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int>> &bin_map)
+{
+    srand48( time( NULL ) );
+        
+    int sx = (int)ceil(sqrt((double)n));
+    int sy = (n+sx-1)/sx;
+    
+    int *shuffle = (int*)malloc( n * sizeof(int) );
+    for( int i = 0; i < n; i++ )
+        shuffle[i] = i;
+    
+    for( int i = 0; i < n; i++ ) 
+    {
+        //
+        //  make sure particles are not spatially sorted
+        //
+        int j = lrand48()%(n-i);
+        int k = shuffle[j];
+        shuffle[j] = shuffle[n-i-1];
+        
+        //
+        //  distribute particles evenly to ensure proper spacing
+        //
+        p[i].x = size*(1.+(k%sx))/(1+sx);
+        p[i].y = size*(1.+(k/sx))/(1+sy);
+
+        //TODO: Assign bin for the particle
+        //bin_map.push_back() vvvv
+        //
+        //  assign random velocities within a bound
+        //
+        p[i].vx = drand48()*2-1;
+        p[i].vy = drand48()*2-1;
+    }
+    free( shuffle );
+}
+
+
+
+
+
+void init_particles( int n, particle_t *p)
 {
     srand48( time( NULL ) );
         

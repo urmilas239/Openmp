@@ -47,7 +47,7 @@ int main( int argc, char **argv )
     set_bin_count(n);
     bin_map = initialize_bin_vector();
     initialize_neighbor_bins();
-    init_particles( n, particles,  bin_map);
+    init_particles1( n, particles,  bin_map);
     
     //
     //  simulate a number of time steps
