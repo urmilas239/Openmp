@@ -14,6 +14,7 @@ int num_of_bins_x;
 int num_of_bins_y;
 int total_bin_count;
 int bin_density;
+int bin_size;
 
 //
 //  tuned constants
@@ -174,6 +175,8 @@ void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int>> &bin
     for( int i = 0; i < n; i++ )
         shuffle[i] = i;
     
+    std::vector<int> particle_list;
+    int bin_index = -1;
     for( int i = 0; i < n; i++ ) 
     {
         //
@@ -190,7 +193,13 @@ void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int>> &bin
         p[i].y = size*(1.+(k/sx))/(1+sy);
 
         //TODO: Assign bin for the particle
-        //bin_map.push_back() vvvv
+         bin_index = compute_bin_index_from_xy( p[i].x, p[i].y , min_r);
+         particle_list = bin_map.at(bin_index);
+         particle_list.push_back(i);
+         bin_map.insert(bin_map.begin() + bin_index, particle_list);
+
+
+
         //
         //  assign random velocities within a bound
         //
