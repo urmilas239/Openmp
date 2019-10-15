@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <math.h>
 #include <vector>
+#include <iostream>
 #include "common.h"
 #include "omp.h"
 

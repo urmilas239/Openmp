@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <vector>
+#include <iostream>
 #include "common.h"
 
 double size;

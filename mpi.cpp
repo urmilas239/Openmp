@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <vector>
+#include <iostream>
 #include "common.h"
 
 //
