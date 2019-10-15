@@ -41,7 +41,7 @@ double read_timer( );
 //  simulation routines
 //
 void set_size( int n );
-void init_particles( int n, particle_t *p );
+void init_particles( int n, particle_t *p, std::vector<std::vector<int>> &bin_map);
 void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, double *davg, int *navg);
 void move( particle_t &p );
 
