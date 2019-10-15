@@ -10,6 +10,8 @@ inline int max( int a, int b ) { return a > b ? a : b; }
 const int NSTEPS = 1000;
 const int SAVEFREQ = 10;
 
+
+
 //
 // particle data structure
 //
@@ -22,6 +24,13 @@ typedef struct
   double ax;
   double ay;
 } particle_t;
+
+
+//Added 
+
+ void set_bin_count();
+ int compute_bin_index_from_xy(int x, int y, int bin_size);
+ std::vector<std::vector<int>> initialize_neighbor_bins();
 
 //
 //  timing routines

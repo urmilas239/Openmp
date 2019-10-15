@@ -32,7 +32,20 @@ int main( int argc, char **argv )
     FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
 
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
+    
+
+
+    //bin_map 
+    
+    std::vector<std::vector<int>> bin_map;
+    std::vector<std::vector<int>> neighbor_bins;
+
     set_size( n );
+
+    //call the function to set bin variables
+    set_bin_count();
+    bin_map = initialize_bin_vector();
+    initialize_neighbor_bins();
     init_particles( n, particles );
     
     //
