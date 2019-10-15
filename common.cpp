@@ -155,6 +155,9 @@ std::vector<std::vector<int>> initialize_neighbor_bins()
 
  int compute_bin_index_from_xy(int x, int y, int bin_size)
  {
+    std::cout<< "bin_size::" <<bin_size<<std::endl;
+    std::cout<< "floor(x/bin_size)::" << floor(x/bin_size) <<std::endl;
+    std::cout<< "floor(y /bin_size)::" << floor(y /bin_size) <<std::endl;
     int bin_index = -1;
     bin_index = (floor(x/bin_size)*num_of_bins_y)+floor(y /bin_size);
     return bin_index;
