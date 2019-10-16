@@ -39,21 +39,25 @@ int main( int argc, char **argv )
 
     //bin_map 
     
-    std::vector<std::vector<int>> bin_map;
-    std::vector<std::vector<int>> neighbor_bins;
+    std::vector<std::vector<int> > bin_map;
+    std::vector<std::vector<int> > neighbor_bins;
 
     set_size( n );
 
     //call the function to set bin variables
     set_bin_count(n);
+    
+    neighbor_bins = initialize_neighbor_bins();
+    init_particles( n, particles);
     bin_map = initialize_bin_vector();
-    initialize_neighbor_bins();
-    init_particles1( n, particles,  bin_map);
+    bin_particles( n, particles , bin_map);
+
     
     //
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
+    //int total_bin_count = bin_map.size();
 	
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -63,18 +67,67 @@ int main( int argc, char **argv )
         //
         //  compute forces
         //
-        for( int i = 0; i < n; i++ )
-        {
-            particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-				apply_force( particles[i], particles[j],&dmin,&davg,&navg);
-        }
+
+         if(0)
+         {
+            for( int i = 0; i < n; i++ )
+            {
+                particles[i].ax = particles[i].ay = 0;
+                for (int j = 0; j < n; j++ )
+                    apply_force( particles[i], particles[j],&dmin,&davg,&navg);
+            }
+         }
+         else
+         {
+            std::vector<int> particle_ids;
+            std::vector<int> neighbor_bins_list;
+            int bin_index;
+
+            for( int i = 0; i < n; i++ )
+            {
+                particles[i].ax = particles[i].ay = 0;
+                bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
+                //std::cout<<"bin_index:::"<<bin_index<<std::endl;
+                particle_ids = bin_map.at(bin_index);
+                neighbor_bins_list = neighbor_bins.at(bin_index);
+
+                //apply force for particles in current bin
+                for(int j = 0; j < particle_ids.size(); j++)
+                {
+                    apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
+                }
+
+
+                //apply force from partcles in neighboring bins
+                for(int k = 0; k<neighbor_bins_list.size();k++)
+                {
+                    if(neighbor_bins_list.at(k) != -1)
+                    {
+                        particle_ids = bin_map.at(neighbor_bins_list.at(k));
+                         for(int j = 0; j < particle_ids.size(); j++)
+                        {
+                            apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
+                        }
+                    }
+                    
+                }
+            }
+         }
+        
+
+            
+           
+        
  
         //
         //  move particles
         //
         for( int i = 0; i < n; i++ ) 
-            move( particles[i] );		
+            move( particles[i]);	
+
+
+        bin_map = initialize_bin_vector();
+        bin_particles( n, particles , bin_map);	
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
