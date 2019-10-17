@@ -173,7 +173,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     std::cout<< "n::" <<n<<std::endl;
     std::cout<< "size::" <<size<<std::endl;
 
-    bin_size = cutoff*4;
+    bin_size = cutoff;
     std::cout<< "bin_size::" <<bin_size<<std::endl;
     num_of_bins_x = ceil(size/bin_size);
     std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;
