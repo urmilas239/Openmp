@@ -13,6 +13,8 @@ all:	$(TARGETS)
 
 serial: serial.o common.o
 	$(CC) -o $@ $(LIBS) serial.o common.o -lm
+binned: binned.o common.o
+	$(CC) -o $@ $(LIBS) binned.o common.o -lm
 autograder: autograder.o common.o
 	$(CC) -o $@ $(LIBS) autograder.o common.o -lm
 openmp: openmp.o common.o
@@ -26,10 +28,12 @@ openmp.o: openmp.cpp common.h
 	$(CC) -c $(OPENMP) $(CFLAGS) openmp.cpp
 serial.o: serial.cpp common.h
 	$(CC) -c $(CFLAGS) serial.cpp
+binned.o: binned.cpp common.h
+	$(CC) -c $(CFLAGS) binned.cpp
 mpi.o: mpi.cpp common.h
 	$(MPCC) -c $(CFLAGS) mpi.cpp
 common.o: common.cpp common.h
 	$(CC) -c $(CFLAGS) common.cpp
 
 clean:
-	rm -f *.o $(TARGETS) *.stdout *.txt
+	rm -f *.o $(TARGETS) *.stdout *.txt *.error
