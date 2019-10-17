@@ -59,6 +59,7 @@ int main( int argc, char **argv )
     {
         bin_map = initialize_bin_vector();
         init_particles1(n, particles,bin_map);
+        //init_particles( n, particles);
         //bin_particles( n, particles , bin_map);
     }
     
@@ -140,19 +141,27 @@ int main( int argc, char **argv )
         //  move particles
         //
         for( int i = 0; i < n; i++ ) 
+        {
+            
+            if(naive)
+            {
+                 move( particles[i]);
+            }
+            else
+            {
+                 move1( particles[i], bin_map);
+                // move( particles[i]);
+                
+            }
+        }
            	
 
-        if(naive)
+        
+        if(!naive)
         {
-             move( particles[i]);
-        }
-        else
-        {
-             move1( particles[i], bin_map);
-            //bin_map = initialize_bin_vector();
+           // bin_map = initialize_bin_vector();
             //bin_particles( n, particles , bin_map); 
         }
-        
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {

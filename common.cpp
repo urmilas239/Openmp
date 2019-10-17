@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include <vector>
 #include <iostream>
+#include <algorithm> 
 #include "common.h"
 
 double size;
@@ -188,6 +189,27 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     
     int bin_index = (floor(x/bin_size)*num_of_bins_y)+floor(y /bin_size);
     return bin_index;
+
+ }
+
+
+ void remove_particle_from_bin(int bin_index, int particle_index, std::vector<std::vector<int> > &bin_map )
+ {
+     std::vector<int> particle_list = bin_map.at(bin_index);
+     int number_of_particles = particle_list.size();
+     for(int i = 0; i< number_of_particles; i++)
+     {
+        if(particle_list.at(i) == particle_index)
+        {
+            particle_list.erase(particle_list.begin() + i);
+            break;
+        }
+
+     }
+     //std::remove(particle_list.begin(), particle_list.end(), particle_index); 
+
+     bin_map.erase(bin_map.begin() + bin_index);
+     bin_map.insert(bin_map.begin()+bin_index, particle_list);
 
  }
 
@@ -442,10 +464,8 @@ void move1( particle_t &p, std::vector<std::vector<int> > &bin_map)
      if(old_bin_index != bin_index)
      {
         std::vector<int> particle_list = bin_map.at(old_bin_index);
-        std::remove(particle_list.begin(), particle_list.end(), p.index); 
-        bin_map.insert(bin_map.begin() + old_bin_index, particle_list);
-
-        particle_list.clear();
+        std::vector<int> particle_list_new  = bin_map.at(bin_index);
+        remove_particle_from_bin(old_bin_index, p.index, bin_map );
         bin_map.at(bin_index).push_back(p.index);
         
        
