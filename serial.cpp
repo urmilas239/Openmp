@@ -14,6 +14,8 @@ int main( int argc, char **argv )
     int navg,nabsavg=0;
     double davg,dmin, absmin=1.0, absavg=0.0;
 
+    bool naive = false;
+
     if( find_option( argc, argv, "-h" ) >= 0 )
     {
         printf( "Options:\n" );
@@ -49,8 +51,12 @@ int main( int argc, char **argv )
     
     neighbor_bins = initialize_neighbor_bins();
     init_particles( n, particles);
-    bin_map = initialize_bin_vector();
-    bin_particles( n, particles , bin_map);
+    if(!naive)
+    {
+        bin_map = initialize_bin_vector();
+        bin_particles( n, particles , bin_map);
+    }
+    
 
     
     //
@@ -61,6 +67,8 @@ int main( int argc, char **argv )
 	
     for( int step = 0; step < NSTEPS; step++ )
     {
+         //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
+
 	navg = 0;
         davg = 0.0;
 	dmin = 1.0;
@@ -68,7 +76,7 @@ int main( int argc, char **argv )
         //  compute forces
         //
 
-         if(0)
+         if(naive)
          {
             for( int i = 0; i < n; i++ )
             {
@@ -97,7 +105,7 @@ int main( int argc, char **argv )
                     apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
                 }
 
-
+                particle_ids.clear();
                 //apply force from partcles in neighboring bins
                 for(int k = 0; k<neighbor_bins_list.size();k++)
                 {
@@ -108,9 +116,11 @@ int main( int argc, char **argv )
                         {
                             apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
                         }
+                         particle_ids.clear();
                     }
                     
                 }
+                neighbor_bins_list.clear();
             }
          }
         
@@ -125,9 +135,12 @@ int main( int argc, char **argv )
         for( int i = 0; i < n; i++ ) 
             move( particles[i]);	
 
-
-        bin_map = initialize_bin_vector();
-        bin_particles( n, particles , bin_map);	
+        if(!naive)
+        {
+            bin_map = initialize_bin_vector();
+            bin_particles( n, particles , bin_map); 
+        }
+        
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
@@ -161,6 +174,7 @@ int main( int argc, char **argv )
     //
     //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
     //
+
     printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
     if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
     if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");

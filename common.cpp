@@ -173,7 +173,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     std::cout<< "n::" <<n<<std::endl;
     std::cout<< "size::" <<size<<std::endl;
 
-    bin_size = cutoff;
+    bin_size = cutoff*4;
     std::cout<< "bin_size::" <<bin_size<<std::endl;
     num_of_bins_x = ceil(size/bin_size);
     std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;
@@ -205,13 +205,34 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     {
         //particle_list.clear();
          bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
-         std::vector<int> particle_list = bin_map.at(bin_index);
-            particle_list.push_back(i);
-            bin_map.insert(bin_map.begin() + bin_index, particle_list);
-
-         
+         //std::vector<int> particle_list = bin_map.at(bin_index);
+         bin_map.at(bin_index).push_back(i);
+         //
+         /*if(bin_index == 3)
+         {
+            std::cout<< "bin_index in bin_particles ::::: " << bin_index << std::endl;
+             for(int j =0; j< particle_list.size(); j++)
+             {
+                std::cout<< "particle Index::"<< particle_list.at(j) << std::endl;
+             }
+         }*/
+        
+            
+           // bin_map.insert(bin_map.begin() + bin_index, particle_list);
+            //particle_list.clear();
          
     }
+
+    //std::vector<int> particle_list;
+    /*for (int i =0; i < bin_map.size(); i++)
+    {
+        std::cout<< ":::::::BIN Index:::::::  "<< i << std::endl;
+        particle_list = bin_map.at(i);
+         for(int j =0; j< particle_list.size(); j++)
+         {
+            std::cout<< "::::particle Index::  "<< particle_list.at(j) << std::endl;
+         }
+    }*/
  }
 
 //
@@ -219,6 +240,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 //
 void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
 {
+   // std::cout<< "INIT_PARTICLES1 START::"<< std::endl;
     srand48( time( NULL ) );
         
     int sx = (int)ceil(sqrt((double)n));
@@ -245,14 +267,14 @@ void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int> > &bi
         //
         p[i].x = size*(1.+(k%sx))/(1+sx);
         p[i].y = size*(1.+(k/sx))/(1+sy);
-        std::cout<< "p[i].x:: " << p[i].x << ",:: p[i].y::" << p[i].y << std::endl;
+        //std::cout<< "p[i].x:: " << p[i].x << ",:: p[i].y:: " << p[i].y << std::endl;
         //TODO: Assign bin for the particle
          bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
          particle_list = bin_map.at(bin_index);
          particle_list.push_back(i);
          bin_map.insert(bin_map.begin() + bin_index, particle_list);
 
-         std::cout<< "init_particles1 ::: bin_index::: " << bin_index << std::endl;
+         //std::cout<< "init_particles1 ::: bin_index::: " << bin_index << std::endl;
 
 
 
@@ -264,6 +286,7 @@ void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int> > &bi
         p[i].index = i;
     }
     free( shuffle );
+    //std::cout<< "INIT_PARTICLES1 END::"<<  std::endl;
 }
 
 
@@ -272,6 +295,7 @@ void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int> > &bi
 
 void init_particles( int n, particle_t *p)
 {
+    //std::cout<< "init_particles1 START::"<< std::endl;
     srand48( time( NULL ) );
         
     int sx = (int)ceil(sqrt((double)n));
@@ -295,6 +319,7 @@ void init_particles( int n, particle_t *p)
         //
         p[i].x = size*(1.+(k%sx))/(1+sx);
         p[i].y = size*(1.+(k/sx))/(1+sy);
+        //std::cout<< "p[i].x:: " << p[i].x << ",:: p[i].y::" << p[i].y << std::endl;
 
         //TODO: Assign bin for the particle
         //bin_map.push_back() vvvv
@@ -307,6 +332,7 @@ void init_particles( int n, particle_t *p)
         //p[i].index = i;
     }
     free( shuffle );
+    //std::cout<< "init_particles1 END::"<< std::endl;
 }
 
 //
@@ -351,6 +377,10 @@ void move( particle_t &p )
     //  conserves energy better than explicit Euler method
     //
 
+    //std::cout<< "Move::Before ::::: p.x :: " << p.x << ",:: p.y ::  " << p.y << std::endl;
+    int old_bin_index = compute_bin_index_from_xy( p.x, p.y);
+    
+
     p.vx += p.ax * dt;
     p.vy += p.ay * dt;
     p.x  += p.vx * dt;
@@ -370,9 +400,11 @@ void move( particle_t &p )
         p.vy = -p.vy;
     }
 
-    
+    //std::cout<< "Move::After:::::: p.x :: " << p.x << ",:: p.y :: " << p.y << std::endl;
+    int new_bin_index = compute_bin_index_from_xy( p.x, p.y);
+    //std::cout<< "old_bin_index::  " <<old_bin_index << " ,new_bin_index::  " <<new_bin_index<<std::endl;
 
-}
+}  
 
 
 
