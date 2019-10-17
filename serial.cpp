@@ -39,7 +39,6 @@ int main( int argc, char **argv )
     
 
 
-    //bin_map 
     
     std::vector<std::vector<int> > bin_map;
     std::vector<std::vector<int> > neighbor_bins;
@@ -50,11 +49,17 @@ int main( int argc, char **argv )
     set_bin_count(n);
     
     neighbor_bins = initialize_neighbor_bins();
-    init_particles( n, particles);
-    if(!naive)
+    
+
+    if(naive)
+    {
+        init_particles( n, particles);
+    }
+    else
     {
         bin_map = initialize_bin_vector();
-        bin_particles( n, particles , bin_map);
+        init_particles1(n, particles,bin_map);
+        //bin_particles( n, particles , bin_map);
     }
     
 
@@ -106,6 +111,8 @@ int main( int argc, char **argv )
                 }
 
                 particle_ids.clear();
+
+
                 //apply force from partcles in neighboring bins
                 for(int k = 0; k<neighbor_bins_list.size();k++)
                 {
@@ -133,12 +140,17 @@ int main( int argc, char **argv )
         //  move particles
         //
         for( int i = 0; i < n; i++ ) 
-            move( particles[i]);	
+           	
 
-        if(!naive)
+        if(naive)
         {
-            bin_map = initialize_bin_vector();
-            bin_particles( n, particles , bin_map); 
+             move( particles[i]);
+        }
+        else
+        {
+             move1( particles[i], bin_map);
+            //bin_map = initialize_bin_vector();
+            //bin_particles( n, particles , bin_map); 
         }
         
 

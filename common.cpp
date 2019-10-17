@@ -62,13 +62,12 @@ std::vector<std::vector<int> > initialize_bin_vector()
 
 std::vector<std::vector<int> > initialize_neighbor_bins()
 {
-    std::cout << ":::IN neighbor_bins::: " << std::endl;
+     //std::cout << ":::IN neighbor_bins::: " << std::endl;
      std::vector<std::vector<int> > neighbor_bins(total_bin_count, std::vector<int>(8, -1)); 
 
-     std::cout << ":::neighbor_bins.size()::: " << neighbor_bins.size()<<std::endl;
+     //std::cout << ":::neighbor_bins.size()::: " << neighbor_bins.size()<<std::endl;
      int index;
      int last_row = num_of_bins_y*(num_of_bins_y-1);
-     std::cout << ":::last_row::: " << last_row<<std::endl;
 
     
 
@@ -77,9 +76,6 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
      { 
         index =0;
 
-      /*std::cout << ":::i  :: " <<i<<std::endl;
-      std::cout << ":::i mod num_of_bins_y :: " << (i%num_of_bins_y ) <<std::endl;
-      std::cout << ":::(i+1) mod num_of_bins_y :: " << ((i+1)%num_of_bins_y) <<std::endl;*/
 
        if(i%num_of_bins_y != 0)
        {
@@ -268,13 +264,12 @@ void init_particles1( int n, particle_t *p ,  std::vector<std::vector<int> > &bi
         p[i].x = size*(1.+(k%sx))/(1+sx);
         p[i].y = size*(1.+(k/sx))/(1+sy);
         //std::cout<< "p[i].x:: " << p[i].x << ",:: p[i].y:: " << p[i].y << std::endl;
-        //TODO: Assign bin for the particle
-         bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
-         particle_list = bin_map.at(bin_index);
-         particle_list.push_back(i);
-         bin_map.insert(bin_map.begin() + bin_index, particle_list);
 
-         //std::cout<< "init_particles1 ::: bin_index::: " << bin_index << std::endl;
+
+        //Assign bin for the particle
+         bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
+         bin_map.at(bin_index).push_back(i);
+         
 
 
 
@@ -450,11 +445,10 @@ void move1( particle_t &p, std::vector<std::vector<int> > &bin_map)
         std::remove(particle_list.begin(), particle_list.end(), p.index); 
         bin_map.insert(bin_map.begin() + old_bin_index, particle_list);
 
-
         particle_list.clear();
-      particle_list = bin_map.at(bin_index);
-      particle_list.push_back(p.index);
-      bin_map.insert(bin_map.begin() + bin_index, particle_list);
+        bin_map.at(bin_index).push_back(p.index);
+        
+       
      }
       
 
