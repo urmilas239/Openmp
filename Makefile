@@ -7,7 +7,7 @@ CFLAGS = -O3 -std=c++11
 LIBS = 
 
 
-TARGETS = serial openmp mpi autograder
+TARGETS = serial binned  openmp mpi autograder
 
 all:	$(TARGETS)
 
