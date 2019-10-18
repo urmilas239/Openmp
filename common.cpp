@@ -10,7 +10,7 @@
 #include <iostream>
 #include <algorithm> 
 #include "common.h"
-#include "omp.h"
+
 
 double size;
 int num_of_bins_x;
@@ -73,8 +73,8 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
     
 
-     #pragma omp parallel
-     {
+     //#pragma omp parallel
+    // {
 		 for(int i=0; i<total_bin_count;i++)
 		 { 
 			index =0;
@@ -139,7 +139,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 			  } 
 			
 		 }
-	 } //OMP parallel ends
+	 //} //OMP parallel ends
 
     
 
@@ -222,7 +222,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
     int bin_index;
     std::vector<int> particle_list;
-	#pragma omp for 
+	//#pragma omp for 
     for( int i = 0; i < n; i++ ) 
     {
         //particle_list.clear();
