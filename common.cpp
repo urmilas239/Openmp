@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm> 
 #include "common.h"
+#include "omp.h"
 
 double size;
 int num_of_bins_x;
@@ -72,71 +73,73 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
     
 
-     
-     for(int i=0; i<total_bin_count;i++)
-     { 
-        index =0;
+     #pragma omp parallel
+     {
+		 for(int i=0; i<total_bin_count;i++)
+		 { 
+			index =0;
 
 
-       if(i%num_of_bins_y != 0)
-       {
-        //not first column
-          neighbor_bins[i][index] =  i-1;
-          index++;
+		   if(i%num_of_bins_y != 0)
+		   {
+			//not first column
+			  neighbor_bins[i][index] =  i-1;
+			  index++;
 
-          if(i >= num_of_bins_y)
-          {
-            //not first row
-            neighbor_bins[i][index] =  i-1-num_of_bins_y;
-            index++;
-          }
+			  if(i >= num_of_bins_y)
+			  {
+				//not first row
+				neighbor_bins[i][index] =  i-1-num_of_bins_y;
+				index++;
+			  }
 
-          if(i < last_row)
-          {
-            // Not last row
-            neighbor_bins[i][index] =  i-1+num_of_bins_y;
-            index++;
-          }
-          
-         
-       }
-
-
-       if((i+1)%num_of_bins_y != 0)
-       {
-        //not last column
-          neighbor_bins[i][index] =  i+1;
-          index++;
-
-          if(i >= num_of_bins_y)
-          {
-            //not first row
-            neighbor_bins[i][index] =  i+1-num_of_bins_y;
-            index++;
-          }
-
-          if(i < last_row)
-          {
-            neighbor_bins[i][index] =  i+1+num_of_bins_y;
-            index++;
-          } 
-          
-       }
+			  if(i < last_row)
+			  {
+				// Not last row
+				neighbor_bins[i][index] =  i-1+num_of_bins_y;
+				index++;
+			  }
+			  
+			 
+		   }
 
 
-       if(i >= num_of_bins_y)
-          {
-            neighbor_bins[i][index] =  i-num_of_bins_y;
-            index++;
-          }
+		   if((i+1)%num_of_bins_y != 0)
+		   {
+			//not last column
+			  neighbor_bins[i][index] =  i+1;
+			  index++;
 
-          if(i < last_row)
-          {
-            neighbor_bins[i][index] =  i+num_of_bins_y;
-            index++;
-          } 
-        
-     }
+			  if(i >= num_of_bins_y)
+			  {
+				//not first row
+				neighbor_bins[i][index] =  i+1-num_of_bins_y;
+				index++;
+			  }
+
+			  if(i < last_row)
+			  {
+				neighbor_bins[i][index] =  i+1+num_of_bins_y;
+				index++;
+			  } 
+			  
+		   }
+
+
+		   if(i >= num_of_bins_y)
+			  {
+				neighbor_bins[i][index] =  i-num_of_bins_y;
+				index++;
+			  }
+
+			  if(i < last_row)
+			  {
+				neighbor_bins[i][index] =  i+num_of_bins_y;
+				index++;
+			  } 
+			
+		 }
+	 } //OMP parallel ends
 
     
 
