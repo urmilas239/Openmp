@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include "common.h"
+#include "omp.h"
 
 //
 //  benchmarking program
@@ -82,7 +83,9 @@ int main( int argc, char **argv )
             std::vector<int> particle_ids;
             std::vector<int> neighbor_bins_list;
             int bin_index;
-
+             //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
+			 //bin_map , particles- shared
+			#pragma omp for reduction (+:navg) reduction(+:davg)
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
@@ -92,6 +95,7 @@ int main( int argc, char **argv )
                 neighbor_bins_list = neighbor_bins.at(bin_index);
 
                 //apply force for particles in current bin
+				 //TODO: OpenMP - Make for parallel
                 for(int j = 0; j < particle_ids.size(); j++)
                 {
                     apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
@@ -101,6 +105,7 @@ int main( int argc, char **argv )
 
 
                 //apply force from partcles in neighboring bins
+				//TODO: OpenMP - Make for parallel
                 for(int k = 0; k<neighbor_bins_list.size();k++)
                 {
                     if(neighbor_bins_list.at(k) != -1)
