@@ -80,19 +80,19 @@ int main( int argc, char **argv )
         //
 
          
-            std::vector<int> particle_ids;
-            std::vector<int> neighbor_bins_list;
+           // std::vector<int> particle_ids;
+           // std::vector<int> neighbor_bins_list;
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
-			#pragma omp for reduction (+:navg) reduction(+:davg)
+			#pragma omp for reduction (+:navg)  private(neighbor_bins) shared(bin_map) reduction(+:davg) 
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
                 bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
                 //std::cout<<"bin_index:::"<<bin_index<<std::endl;
-                particle_ids = bin_map.at(bin_index);
-                neighbor_bins_list = neighbor_bins.at(bin_index);
+                std::vector<int>  particle_ids = bin_map.at(bin_index);
+                std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
 
                 //apply force for particles in current bin
 				 //TODO: OpenMP - Make for parallel
