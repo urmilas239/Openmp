@@ -15,8 +15,8 @@ serial: serial.o common.o
 	$(CC) -o $@ $(LIBS) serial.o common.o -lm
 binned: binned.o common.o
 	$(CC) -o $@ $(LIBS) binned.o common.o -lm
-binnedOpenMp: binnedOpenMP.o common.o -lm
-	$(CC) -o $@ $(LIBS) $(OPENMP) binnedOpenMP.o common.o -lm 
+binnedOpenMp: binnedOpenMP.o common.o 
+	$(CC) -o $@ $(LIBS) $(OPENMP) binnedOpenMP.o common.o -lm
 autograder: autograder.o common.o
 	$(CC) -o $@ $(LIBS) autograder.o common.o -lm
 openmp: openmp.o common.o
