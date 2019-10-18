@@ -222,6 +222,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
     int bin_index;
     std::vector<int> particle_list;
+	#pragma omp for 
     for( int i = 0; i < n; i++ ) 
     {
         //particle_list.clear();
