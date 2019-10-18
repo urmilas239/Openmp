@@ -38,7 +38,7 @@ binned.o: binned.cpp common.h
 mpi.o: mpi.cpp common.h
 	$(MPCC) -c $(CFLAGS) mpi.cpp
 common.o: common.cpp common.h
-	$(CC) -c $(OPENMP)  $(CFLAGS) common.cpp
+	$(CC) -c  $(CFLAGS) common.cpp
 
 clean:
 	rm -f *.o $(TARGETS) *.stdout *.txt *.error
