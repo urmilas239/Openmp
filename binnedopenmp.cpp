@@ -94,9 +94,10 @@ int main( int argc, char **argv )
                 bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
                 std::cout<<"bin_index:::"<<bin_index<<std::endl;
                 std::vector<int>  particle_ids = bin_map.at(bin_index);
+                std::cout<<"particle_ids size::: "<<particle_ids.size()<<std::endl;
                 std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
 
-                std::cout<<"particle_ids size::: "<<particle_ids.size()<<std::endl;
+                
                 std::cout<<"neighbor_bins_list size::: "<<neighbor_bins_list.size()<<std::endl;
 
                 //apply force for particles in current bin
