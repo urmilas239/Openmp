@@ -132,7 +132,6 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
