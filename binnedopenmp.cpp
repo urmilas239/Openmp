@@ -106,7 +106,6 @@ int main( int argc, char **argv )
 
                 //apply force from partcles in neighboring bins
 				//TODO: OpenMP - Make for parallel
-				#pragma omp for
                 for(int k = 0; k<neighbor_bins_list.size();k++)
                 {
                     if(neighbor_bins_list.at(k) != -1)
