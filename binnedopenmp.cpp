@@ -92,7 +92,7 @@ int main( int argc, char **argv )
             {
                 particles[i].ax = particles[i].ay = 0;
                 bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
-                //std::cout<<"bin_index:::"<<bin_index<<std::endl;
+                std::cout<<"bin_index:::"<<bin_index<<std::endl;
                 std::vector<int>  particle_ids = bin_map.at(bin_index);
                 std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
 
