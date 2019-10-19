@@ -68,6 +68,7 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     //int total_bin_count = bin_map.size();
 	
+    #pragma omp for private(neighbor_bins) 
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
@@ -85,7 +86,7 @@ int main( int argc, char **argv )
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
-			#pragma omp for  private(neighbor_bins) 
+			
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
