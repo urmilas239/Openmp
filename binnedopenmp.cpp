@@ -69,7 +69,7 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     //int total_bin_count = bin_map.size();
 	
-    //#pragma omp for private(neighbor_bins) 
+    #pragma omp for  
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
@@ -92,13 +92,13 @@ int main( int argc, char **argv )
             {
                 particles[i].ax = particles[i].ay = 0;
                 bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
-                std::cout<<"bin_index:::"<<bin_index<<std::endl;
+                //std::cout<<"bin_index:::"<<bin_index<<std::endl;
                 std::vector<int>  particle_ids = bin_map.at(bin_index);
-                std::cout<<"particle_ids size::: "<<particle_ids.size()<<std::endl;
+                //std::cout<<"particle_ids size::: "<<particle_ids.size()<<std::endl;
                 std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
 
                 
-                std::cout<<"neighbor_bins_list size::: "<<neighbor_bins_list.size()<<std::endl;
+                //std::cout<<"neighbor_bins_list size::: "<<neighbor_bins_list.size()<<std::endl;
 
                 //apply force for particles in current bin
 				 //TODO: OpenMP - Make for parallel
