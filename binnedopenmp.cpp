@@ -69,7 +69,7 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     //int total_bin_count = bin_map.size();
 	
-    #pragma omp for  
+    #pragma omp for firstprivate(neighbor_bins)
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
