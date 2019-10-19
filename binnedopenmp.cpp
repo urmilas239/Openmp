@@ -49,13 +49,14 @@ int main( int argc, char **argv )
     set_bin_count(n);
     
     neighbor_bins = initialize_neighbor_bins();
-    
+    std::cout<<"neighbor_bins size::: "<<neighbor_bins.size()<<std::endl;
 
 
     //Initialize particles and assign bins
 
         bin_map = initialize_bin_vector();
         init_particles1(n, particles,bin_map);
+        std::cout<<"bin_map size::: "<<bin_map.size()<<std::endl;
         //init_particles( n, particles);
         //bin_particles( n, particles , bin_map);
     
