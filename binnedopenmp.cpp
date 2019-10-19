@@ -85,7 +85,7 @@ int main( int argc, char **argv )
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
-			
+			#pragma omp for  private(neighbor_bins) 
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
@@ -106,7 +106,7 @@ int main( int argc, char **argv )
 
                 //apply force from partcles in neighboring bins
 				//TODO: OpenMP - Make for parallel
-				
+				#pragma omp for
                 for(int k = 0; k<neighbor_bins_list.size();k++)
                 {
                     if(neighbor_bins_list.at(k) != -1)
