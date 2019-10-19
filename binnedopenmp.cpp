@@ -96,6 +96,9 @@ int main( int argc, char **argv )
                 std::vector<int>  particle_ids = bin_map.at(bin_index);
                 std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
 
+                std::cout<<"particle_ids size::: "<<particle_ids.size()<<std::endl;
+                std::cout<<"neighbor_bins_list size::: "<<neighbor_bins_list.size()<<std::endl;
+
                 //apply force for particles in current bin
 				 //TODO: OpenMP - Make for parallel
                 for(int j = 0; j < particle_ids.size(); j++)
