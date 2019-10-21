@@ -7,6 +7,10 @@
 #include "common.h"
 #include "omp.h"
 
+
+std::vector<std::vector<int> > bin_map;
+std::vector<std::vector<int> > neighbor_bins;
+
 //
 //  benchmarking program
 //
@@ -40,8 +44,7 @@ int main( int argc, char **argv )
 
 
     
-    std::vector<std::vector<int> > bin_map;
-    std::vector<std::vector<int> > neighbor_bins;
+    
 
     set_size( n );
 
