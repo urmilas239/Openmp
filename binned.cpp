@@ -85,6 +85,7 @@ int main( int argc, char **argv )
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
+            
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
@@ -131,7 +132,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-	
+	   
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
