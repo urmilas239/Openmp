@@ -49,14 +49,13 @@ int main( int argc, char **argv )
     set_bin_count(n);
     
     neighbor_bins = initialize_neighbor_bins();
-    std::cout<<"neighbor_bins size::: "<<neighbor_bins.size()<<std::endl;
+    
 
 
     //Initialize particles and assign bins
 
         bin_map = initialize_bin_vector();
         init_particles1(n, particles,bin_map);
-        std::cout<<"bin_map size::: "<<bin_map.size()<<std::endl;
         //init_particles( n, particles);
         //bin_particles( n, particles , bin_map);
     
@@ -69,7 +68,6 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     //int total_bin_count = bin_map.size();
 	
-    #pragma omp for firstprivate(neighbor_bins)
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
@@ -94,11 +92,7 @@ int main( int argc, char **argv )
                 bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
                 //std::cout<<"bin_index:::"<<bin_index<<std::endl;
                 std::vector<int>  particle_ids = bin_map.at(bin_index);
-                //std::cout<<"particle_ids size::: "<<particle_ids.size()<<std::endl;
                 std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
-
-                
-                //std::cout<<"neighbor_bins_list size::: "<<neighbor_bins_list.size()<<std::endl;
 
                 //apply force for particles in current bin
 				 //TODO: OpenMP - Make for parallel
@@ -112,6 +106,7 @@ int main( int argc, char **argv )
 
                 //apply force from partcles in neighboring bins
 				//TODO: OpenMP - Make for parallel
+				
                 for(int k = 0; k<neighbor_bins_list.size();k++)
                 {
                     if(neighbor_bins_list.at(k) != -1)
@@ -137,6 +132,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
+		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
