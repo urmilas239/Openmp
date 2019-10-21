@@ -92,7 +92,7 @@ int main( int argc, char **argv )
 			 //bin_map , particles- shared
 			//std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
             //std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
-            #pragma omp parallel for firstprivate(neighbor_bins, bin_map)
+            //#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
@@ -127,7 +127,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-		//#pragma omp for
+		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
