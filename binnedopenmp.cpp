@@ -135,17 +135,19 @@ int main( int argc, char **argv )
 		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
-            //move( particles[i]);
-            move1( particles[i], bin_map);            
+            move( particles[i]);
+            //move1( particles[i], bin_map);            
         }
            	
 
         
         //if(0)
        // {
-            //bin_map = initialize_bin_vector();
-            //bin_particles( n, particles , bin_map); 
-        //}
+        #pragma omp parallel
+        {
+            bin_map = initialize_bin_vector();
+            bin_particles( n, particles , bin_map); 
+        }
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
