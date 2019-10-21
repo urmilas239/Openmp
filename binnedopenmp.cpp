@@ -90,12 +90,13 @@ int main( int argc, char **argv )
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
-			
+			std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
+            std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
                 bin_index = compute_bin_index_from_xy(particles[i].x, particles[i].y);
-                //std::cout<<"bin_index:::"<<bin_index<<std::endl;
+
                 std::vector<int>  particle_ids ; //= bin_map.at(bin_index);
                 std::vector<int> neighbor_bins_list = neighbor_bins.at(bin_index);
                 neighbor_bins_list.push_back(bin_index);
