@@ -85,7 +85,7 @@ int main( int argc, char **argv )
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
-			#pragma omp for firstprivate(neighbor_bins)
+			#pragma omp for
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
