@@ -72,7 +72,7 @@ int main( int argc, char **argv )
     omp_set_num_threads(10);
     numthreads = omp_get_num_threads();
     //int total_bin_count = bin_map.size();
-	#pragma omp for firstprivate(neighbor_bins, bin_map)
+	#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
