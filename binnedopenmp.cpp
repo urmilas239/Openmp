@@ -143,8 +143,8 @@ int main( int argc, char **argv )
         
         //if(0)
        // {
-            bin_map = initialize_bin_vector();
-            bin_particles( n, particles , bin_map); 
+            //bin_map = initialize_bin_vector();
+            //bin_particles( n, particles , bin_map); 
         //}
 
         if( find_option( argc, argv, "-no" ) == -1 )
