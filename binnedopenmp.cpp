@@ -16,7 +16,7 @@ std::vector<std::vector<int> > neighbor_bins;
 //
 int main( int argc, char **argv )
 {    
-    int navg,nabsavg=0;
+    int navg,nabsavg=0,numthreads;
     double davg,dmin, absmin=1.0, absavg=0.0;
 
 
@@ -69,6 +69,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
+    numthreads = omp_get_num_threads();
     //int total_bin_count = bin_map.size();
 	#pragma omp for firstprivate(neighbor_bins, bin_map)
     for( int step = 0; step < NSTEPS; step++ )
