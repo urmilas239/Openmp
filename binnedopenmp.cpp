@@ -51,7 +51,7 @@ int main( int argc, char **argv )
     //call the function to set bin variables
     set_bin_count(n);
     bin_map = initialize_bin_vector();
-    bin_particles( n, particles , bin_map);
+    //bin_particles( n, particles , bin_map);
     neighbor_bins = initialize_neighbor_bins();
     init_particles1(n, particles,bin_map);
     
@@ -70,7 +70,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    omp_set_num_threads(5);
+    omp_set_num_threads(1);
 
     //int total_bin_count = bin_map.size();
 	
