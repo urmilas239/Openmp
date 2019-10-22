@@ -209,9 +209,9 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
         }
 
      }
-     std::remove(particle_list.begin(), particle_list.end(), particle_index); 
+     //std::remove(particle_list.begin(), particle_list.end(), particle_index); 
 
-    // bin_map.erase(bin_map.begin() + bin_index);
+     bin_map.erase(bin_map.begin() + bin_index);
      bin_map.insert(bin_map.begin()+bin_index, particle_list);
 
  }
@@ -457,8 +457,8 @@ void move1( particle_t &p, std::vector<std::vector<int> > &bin_map)
      //std::cout<< "bin_index::" <<bin_index<<std::endl;
      if(old_bin_index != bin_index)
      {
-        std::vector<int> particle_list = bin_map.at(old_bin_index);
-        std::vector<int> particle_list_new  = bin_map.at(bin_index);
+        //std::vector<int> particle_list = bin_map.at(old_bin_index);
+        //std::vector<int> particle_list_new  = bin_map.at(bin_index);
         remove_particle_from_bin(old_bin_index, p.index, bin_map );
         bin_map.at(bin_index).push_back(p.index);
         
