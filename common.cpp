@@ -220,13 +220,14 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
  void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
  {
     std::cout<< "::::bin_particles::  START"<< std::endl;
-    /*int bin_map_size = bin_map.size();
-    for (int i=0; i<=bin_map_size; i++)
-    {
-        bin_map.at(i).swap(std::vector<int>());
-    } */
+    
      bin_map.clear();
      bin_map.reserve(total_bin_count);
+     int bin_map_size = bin_map.size();
+    for (int i=0; i<=bin_map_size; i++)
+    {
+        bin_map.at(i).push_back(std::vector<int>());
+    } 
 
 
     std::cout<< "::::bin_particles::  AFTER CLEAR"<< std::endl;
