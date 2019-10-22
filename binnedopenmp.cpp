@@ -51,9 +51,10 @@ int main( int argc, char **argv )
     //call the function to set bin variables
     set_bin_count(n);
     bin_map = initialize_bin_vector();
-    //bin_particles( n, particles , bin_map);
+    bin_particles( n, particles , bin_map);
     neighbor_bins = initialize_neighbor_bins();
-    init_particles1(n, particles,bin_map);
+    //init_particles1(n, particles,bin_map);
+    init_particles( n, particles);
     
 
 
@@ -74,7 +75,7 @@ int main( int argc, char **argv )
 
     //int total_bin_count = bin_map.size();
 	
-    #pragma omp parallel private(dmin)  shared(neighbor_bins, bin_map)
+    #pragma omp parallel private(dmin)  firstprivate(neighbor_bins, bin_map)
     {
 
 
@@ -153,12 +154,13 @@ int main( int argc, char **argv )
 
             if(omp_get_thread_num == 0)
             {
+                bin_map.clear();
                 bin_map = initialize_bin_vector();
                 bin_particles( n, particles , bin_map); 
             }
             //
             
-            std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
+            //std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
         }
         //std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
 
