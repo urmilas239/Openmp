@@ -157,10 +157,12 @@ int main( int argc, char **argv )
        // {
         #pragma omp master
         {
+
             bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
+            std::cout<<"bin_map.size():::: "<<bin_map.size()<<std::endl;
         }
-        std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
+        //std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
