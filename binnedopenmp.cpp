@@ -50,6 +50,7 @@ int main( int argc, char **argv )
 
     //call the function to set bin variables
     set_bin_count(n);
+    bin_map = initialize_bin_vector();
     bin_particles( n, particles , bin_map);
     neighbor_bins = initialize_neighbor_bins();
     init_particles1(n, particles,bin_map);
@@ -141,8 +142,8 @@ int main( int argc, char **argv )
 		//#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
-            move( particles[i]);
-            //move1( particles[i], bin_map);            
+            //move( particles[i]);
+            move1( particles[i], bin_map);            
         }
            	
 
@@ -154,14 +155,14 @@ int main( int argc, char **argv )
         
         //if(0)
        // {
-        #pragma omp master
+       /* #pragma omp master
         {
 
         
             //bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
             std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
-        }
+        }*/
         //std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
 
         if( find_option( argc, argv, "-no" ) == -1 )

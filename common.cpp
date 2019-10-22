@@ -219,14 +219,14 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
  void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
  {
-    std::cout<< "::::bin_particles::  START"<< std::endl;
+    /*std::cout<< "::::bin_particles::  START"<< std::endl;
     
      bin_map.clear();
      bin_map.reserve(total_bin_count);
      int bin_map_size = bin_map.size();
     
 
-    std::cout<< "::::bin_particles::  AFTER CLEAR"<< std::endl;
+    std::cout<< "::::bin_particles::  AFTER CLEAR"<< std::endl;*/
 
     int bin_index;
     std::vector<int> particle_list;
