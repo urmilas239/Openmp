@@ -71,7 +71,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    //omp_set_num_threads();
+    omp_set_num_threads(15);
 
     //int total_bin_count = bin_map.size();
 	
@@ -101,7 +101,7 @@ int main( int argc, char **argv )
 			//std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
             //std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
             //#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
-            #pragma omp for reduction (+:navg) reduction(+:davg)  
+            #pragma omp for //reduction (+:navg) reduction(+:davg)  
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
