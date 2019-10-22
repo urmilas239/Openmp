@@ -142,8 +142,8 @@ int main( int argc, char **argv )
 		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
-            //move( particles[i]);
-            move1( particles[i], bin_map);            
+            move( particles[i]);
+            //move1( particles[i], bin_map);            
         }
            	
 
