@@ -224,9 +224,10 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
      bin_map.clear();
      bin_map.reserve(total_bin_count);
      int bin_map_size = bin_map.size();
+     std::vector<int> v1;
     for (int i=0; i<=bin_map_size; i++)
     {
-        bin_map.at(i).push_back(std::vector<int> v1);
+        bin_map.at(i).push_back(v1);
     } 
 
 
