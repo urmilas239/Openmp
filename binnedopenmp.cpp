@@ -142,8 +142,8 @@ int main( int argc, char **argv )
 		//#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
-            //move( particles[i]);
-            move1( particles[i], bin_map);            
+            move( particles[i]);
+            //move1( particles[i], bin_map);            
         }
            	
 
@@ -155,14 +155,18 @@ int main( int argc, char **argv )
         
         //if(0)
        // {
-       /* #pragma omp master
+        #pragma omp barrier
         {
 
-        
-            //bin_map = initialize_bin_vector();
-            bin_particles( n, particles , bin_map); 
+            if(omp_get_thread_num == 0)
+            {
+                bin_map = initialize_bin_vector();
+                bin_particles( n, particles , bin_map); 
+            }
+            //
+            
             std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
-        }*/
+        }
         //std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
 
         if( find_option( argc, argv, "-no" ) == -1 )
