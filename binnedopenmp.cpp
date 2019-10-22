@@ -158,7 +158,7 @@ int main( int argc, char **argv )
         #pragma omp master
         {
 
-            if(bin_map.size > 0)
+            if(bin_map.size() > 0)
             {
                 bin_map.clear();
             }
