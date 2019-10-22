@@ -226,7 +226,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
      int bin_map_size = bin_map.size();
     for (int i=0; i<=bin_map_size; i++)
     {
-        bin_map.at(i).push_back(std::vector<int>());
+        bin_map.at(i).push_back(std::vector<int> v1);
     } 
 
 
