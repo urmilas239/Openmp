@@ -226,7 +226,8 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
         bin_map.at(i).swap(std::vector<int>());
     } */
      bin_map.clear();
-     bin_map(total_bin_count, std::vector<int>()); 
+     bin_map.reserve(total_bin_count);
+
 
     std::cout<< "::::bin_particles::  AFTER CLEAR"<< std::endl;
 

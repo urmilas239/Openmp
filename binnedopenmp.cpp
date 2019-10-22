@@ -90,8 +90,7 @@ int main( int argc, char **argv )
         //
         //  compute forces
         //
-       std::vector<std::vector<int> > bin_map_local = bin_map;
-         
+       
            // std::vector<int> particle_ids;
            // std::vector<int> neighbor_bins_list;
             int bin_index;
@@ -114,7 +113,7 @@ int main( int argc, char **argv )
                 {
                     if(neighbor_bins_list.at(k) != -1)
                     {
-                        particle_ids = bin_map_local.at(neighbor_bins_list.at(k));
+                        particle_ids = bin_map.at(neighbor_bins_list.at(k));
                          for(int j = 0; j < particle_ids.size(); j++)
                         {
                             apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
