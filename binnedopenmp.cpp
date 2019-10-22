@@ -129,7 +129,7 @@ int main( int argc, char **argv )
         std::cout<<"After FOR::: in thread  "<<omp_get_thread_num()<<std::endl;
         
 
-        #pragma omp critical
+        #pragma omp barrier 
         {
             std::cout<<"All threads finished gather here  "<<omp_get_thread_num()<<std::endl;
         }
