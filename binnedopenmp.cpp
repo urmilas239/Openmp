@@ -71,13 +71,15 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     omp_set_num_threads(10);
 
-    numthreads = omp_get_num_threads();
-
-    std::cout<<"numthreads:::"<<numthreads<<std::endl;
     //int total_bin_count = bin_map.size();
 	
     #pragma omp parallel private(dmin)  firstprivate(neighbor_bins, bin_map)
     {
+
+        
+    numthreads = omp_get_num_threads();
+
+    std::cout<<"numthreads:::"<<numthreads<<std::endl;
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
