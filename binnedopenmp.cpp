@@ -79,7 +79,7 @@ int main( int argc, char **argv )
 
     numthreads = omp_get_num_threads();
 
-    std::cout<<"numthreads:::"<<numthreads<<std::endl;
+    //std::cout<<"numthreads:::"<<numthreads<<std::endl;
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
@@ -98,7 +98,7 @@ int main( int argc, char **argv )
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
 			//std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
-            std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
+            //std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
             //#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
             #pragma omp for reduction (+:navg) reduction(+:davg)  
             for( int i = 0; i < n; i++ )
