@@ -126,7 +126,7 @@ int main( int argc, char **argv )
                 neighbor_bins_list.clear();
             }
          
-        std::cout<<"After FOR::: in thread  "<<omp_get_thread_num()<<std::endl;
+       
         
 
         #pragma omp barrier 
@@ -139,7 +139,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-		#pragma omp for
+		//#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
@@ -166,7 +166,7 @@ int main( int argc, char **argv )
           //
           // Computing statistical data
           //
-           #pragma omp master 
+          #pragma omp master 
           if (navg) {
             absavg +=  davg/navg;
             nabsavg++;
