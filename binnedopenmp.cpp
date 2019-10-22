@@ -52,13 +52,14 @@ int main( int argc, char **argv )
     set_bin_count(n);
     
     neighbor_bins = initialize_neighbor_bins();
+    bin_map = initialize_bin_vector();
+    init_particles1(n, particles,bin_map);
     
 
 
     //Initialize particles and assign bins
 
-        bin_map = initialize_bin_vector();
-        init_particles1(n, particles,bin_map);
+        
         //init_particles( n, particles);
         //bin_particles( n, particles , bin_map);
     
@@ -90,7 +91,7 @@ int main( int argc, char **argv )
         //
         //  compute forces
         //
-
+       std::vector<std::vector<int> > bin_map_local = bin_map;
          
            // std::vector<int> particle_ids;
            // std::vector<int> neighbor_bins_list;
@@ -114,7 +115,7 @@ int main( int argc, char **argv )
                 {
                     if(neighbor_bins_list.at(k) != -1)
                     {
-                        particle_ids = bin_map.at(neighbor_bins_list.at(k));
+                        particle_ids = bin_map_local.at(neighbor_bins_list.at(k));
                          for(int j = 0; j < particle_ids.size(); j++)
                         {
                             apply_force( particles[i], particles[particle_ids.at(j)],&dmin,&davg,&navg);
@@ -159,7 +160,7 @@ int main( int argc, char **argv )
         {
 
         
-            //bin_map = initialize_bin_vector();
+            bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
             std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
         }
