@@ -139,7 +139,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-		#pragma omp critical
+		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             //move( particles[i]);
@@ -147,6 +147,11 @@ int main( int argc, char **argv )
         }
            	
 
+
+        #pragma omp barrier 
+        {
+            std::cout<<"All threads finished gather here after move "<<omp_get_thread_num()<<std::endl;
+        }
         
         //if(0)
        // {
