@@ -100,7 +100,7 @@ int main( int argc, char **argv )
 			//std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
             //std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
             //#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
-            #pragma omp for reduction (+:navg) reduction(+:davg)   firstprivate(neighbor_bins, bin_map)
+            #pragma omp for reduction (+:navg) reduction(+:davg)   
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
