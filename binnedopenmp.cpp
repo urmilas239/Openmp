@@ -150,7 +150,7 @@ int main( int argc, char **argv )
 
         #pragma omp barrier 
         {
-            std::cout<<"All threads finished gather here after move "<<omp_get_thread_num()<<std::endl;
+            //std::cout<<"All threads finished gather here after move "<<omp_get_thread_num()<<std::endl;
         }
         
         //if(0)
@@ -160,6 +160,7 @@ int main( int argc, char **argv )
             bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
         }
+        std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
