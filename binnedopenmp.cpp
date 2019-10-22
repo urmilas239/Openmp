@@ -50,7 +50,7 @@ int main( int argc, char **argv )
 
     //call the function to set bin variables
     set_bin_count(n);
-    
+    bin_particles( n, particles , bin_map);
     neighbor_bins = initialize_neighbor_bins();
     init_particles1(n, particles,bin_map);
     
