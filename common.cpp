@@ -220,7 +220,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
  void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
  {
     //bin_map = initialize_bin_vector();
-    bin_map.clear();
+    //bin_map.clear();
     bin_map = initialize_bin_vector();
     int bin_index;
     std::vector<int> particle_list;
