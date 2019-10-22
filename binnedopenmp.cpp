@@ -70,7 +70,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    omp_set_num_threads(2);
+    //omp_set_num_threads();
 
     //int total_bin_count = bin_map.size();
 	
