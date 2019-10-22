@@ -70,7 +70,10 @@ int main( int argc, char **argv )
     //
     double simulation_time = read_timer( );
     omp_set_num_threads(10);
+
     numthreads = omp_get_num_threads();
+
+    std::cout<<"numthreads:::"<<numthreads<<std::endl;
     //int total_bin_count = bin_map.size();
 	
     for( int step = 0; step < NSTEPS; step++ )
