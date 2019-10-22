@@ -160,7 +160,7 @@ int main( int argc, char **argv )
 
             bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
-            std::cout<<"bin_map.size():::: "<<bin_map.size()<<std::endl;
+            std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
         }
         //std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
 
