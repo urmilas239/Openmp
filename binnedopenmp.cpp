@@ -69,7 +69,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    omp_set_num_threads(10);
+    omp_set_num_threads(5);
 
     //int total_bin_count = bin_map.size();
 	
@@ -97,7 +97,7 @@ int main( int argc, char **argv )
             int bin_index;
              //TODO: OpenMP - make particle_ids, neighbor_bins_list private, neighbor_bins;
 			 //bin_map , particles- shared
-			std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
+			//std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
             std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
             //#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
             #pragma omp for reduction (+:navg) reduction(+:davg)  
@@ -126,6 +126,7 @@ int main( int argc, char **argv )
                 neighbor_bins_list.clear();
             }
          
+        std::cout<<"After FOR::: in thread  "<<omp_get_thread_num()<<std::endl;
         
 
             
