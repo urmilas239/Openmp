@@ -76,7 +76,8 @@ int main( int argc, char **argv )
     std::cout<<"numthreads:::"<<numthreads<<std::endl;
     //int total_bin_count = bin_map.size();
 	
-    #pragma omp parallel
+    #pragma omp parallel private(dmin) 
+    {
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
@@ -97,6 +98,7 @@ int main( int argc, char **argv )
 			//std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
             //std::cout<<"neighbor_bins:::"<<neighbor_bins.size()<<std::endl;
             //#pragma omp parallel for firstprivate(neighbor_bins, bin_map)
+            #pragma omp for reduction (+:navg) reduction(+:davg)
             for( int i = 0; i < n; i++ )
             {
                 particles[i].ax = particles[i].ay = 0;
@@ -131,7 +133,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-		//#pragma omp for
+		#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
@@ -142,30 +144,35 @@ int main( int argc, char **argv )
         
         //if(0)
        // {
-        //#pragma omp parallel
-        //{
+        #pragma omp master
+        {
             bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
-        //}
+        }
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
           //
           // Computing statistical data
           //
+           #pragma omp master 
           if (navg) {
             absavg +=  davg/navg;
             nabsavg++;
           }
+
+          #pragma omp critical
           if (dmin < absmin) absmin = dmin;
 		
           //
           //  save if necessary
           //
+          #pragma omp master
           if( fsave && (step%SAVEFREQ) == 0 )
               save( fsave, n, particles );
         }
     }
+} //omp parallel region ends
     simulation_time = read_timer( ) - simulation_time;
     
     //printf( "n = %d, simulation time = %g seconds", n, simulation_time);
