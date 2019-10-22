@@ -219,7 +219,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
  void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
  {
-
+    bin_map = initialize_bin_vector();
     int bin_index;
     std::vector<int> particle_list;
 	//#pragma omp for 
@@ -229,19 +229,6 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
          bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
          //std::vector<int> particle_list = bin_map.at(bin_index);
          bin_map.at(bin_index).push_back(i);
-         //
-         /*if(bin_index == 3)
-         {
-            std::cout<< "bin_index in bin_particles ::::: " << bin_index << std::endl;
-             for(int j =0; j< particle_list.size(); j++)
-             {
-                std::cout<< "particle Index::"<< particle_list.at(j) << std::endl;
-             }
-         }*/
-        
-            
-           // bin_map.insert(bin_map.begin() + bin_index, particle_list);
-            //particle_list.clear();
          
     }
 
