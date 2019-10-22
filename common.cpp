@@ -209,10 +209,10 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
         }
 
      }
-     //std::remove(particle_list.begin(), particle_list.end(), particle_index); 
+     std::remove(particle_list.begin(), particle_list.end(), particle_index); 
 
-     bin_map.erase(bin_map.begin() + bin_index);
-     bin_map.insert(bin_map.begin()+bin_index, particle_list);
+    // bin_map.erase(bin_map.begin() + bin_index);
+    // bin_map.insert(bin_map.begin()+bin_index, particle_list);
 
  }
 
