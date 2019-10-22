@@ -158,11 +158,7 @@ int main( int argc, char **argv )
         #pragma omp master
         {
 
-            if(bin_map.size() > 0)
-            {
-                bin_map.clear();
-            }
-            
+        
             //bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
             std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;

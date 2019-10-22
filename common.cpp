@@ -219,6 +219,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
  void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
  {
+    std::cout<< "::::bin_particles::  START"<< std::endl;
     //bin_map = initialize_bin_vector();
     //bin_map.clear();
     //
@@ -250,6 +251,8 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
             std::cout<< "::::particle Index::  "<< particle_list.at(j) << std::endl;
          }
     }*/
+
+     std::cout<< "::::bin_particles::  END"<< std::endl;
  }
 
 //
