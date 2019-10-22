@@ -52,7 +52,6 @@ int main( int argc, char **argv )
     set_bin_count(n);
     
     neighbor_bins = initialize_neighbor_bins();
-    bin_map(total_bin_count, std::vector<int>()); 
     init_particles1(n, particles,bin_map);
     
 
