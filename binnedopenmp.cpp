@@ -52,7 +52,7 @@ int main( int argc, char **argv )
     set_bin_count(n);
     
     neighbor_bins = initialize_neighbor_bins();
-    bin_map = initialize_bin_vector();
+    bin_map(total_bin_count, std::vector<int>()); 
     init_particles1(n, particles,bin_map);
     
 
@@ -160,7 +160,7 @@ int main( int argc, char **argv )
         {
 
         
-            bin_map = initialize_bin_vector();
+            //bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map); 
             std::cout<<"step:::  "<<step<<"  ,bin_map.size():::: "<<bin_map.size()<<std::endl;
         }
