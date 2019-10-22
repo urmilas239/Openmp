@@ -76,6 +76,7 @@ int main( int argc, char **argv )
     std::cout<<"numthreads:::"<<numthreads<<std::endl;
     //int total_bin_count = bin_map.size();
 	
+    #pragma omp parallel
     for( int step = 0; step < NSTEPS; step++ )
     {
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
@@ -130,7 +131,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
-		#pragma omp for
+		//#pragma omp for
         for( int i = 0; i < n; i++ ) 
         {
             move( particles[i]);
