@@ -179,11 +179,11 @@ bin_particles( n, particles , bin_map);
 
 
        
-        
+        //int temp_val[3] = {num_of_particles_in_proc, num_of_bins_in_proc, num_of_neighbors_in_proc};
 
-         MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
-         MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
-         MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
+         MPI_Recv(&num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+         MPI_Recv(&num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+         MPI_Recv(&num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
 
 
 
