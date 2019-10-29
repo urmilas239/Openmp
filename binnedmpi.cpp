@@ -1,3 +1,4 @@
+#include <mpi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -149,7 +150,7 @@ bin_particles( n, particles , bin_map);
             }
             
 
-             for(i=0;i<n_proc;i++)
+             for(int i=0;i<n_proc;i++)
              {
                 
                 form_particles_array_for_MPI(process_bins.at(i), bin_map, neighbor_bins, particles_to_send, particles_neighbors, pbm, n_bins, particles,partition_sizes,partition_offsets);
