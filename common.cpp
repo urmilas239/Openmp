@@ -65,6 +65,7 @@ std::vector<std::vector<int> > initialize_bin_vector()
 //Divides bins(hence particles) across process
 std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map)
 {
+    std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
 
@@ -84,6 +85,7 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
             current_process_id++;
         }
     }
+    std::cout<<"assign_bins_to_processes_mpi END::: "<<std::endl;
     return process_bins;
 }
 
@@ -99,6 +101,7 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
     int *partition_sizes, 
     int *partition_offsets)
 {
+    std::cout<<"form_particles_array_for_MPI START::: "<<std::endl;
     //std::vector<int>  bin_ids = process_bins.at(process_id);
     int num_of_bins_in_curr_proc = bin_ids.size();
     int particles_per_bin;
@@ -175,12 +178,14 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
                 particle_index++;
             }
     }
+    std::cout<<"form_particles_array_for_MPI END::: "<<std::endl;
 
 }
 
 
 std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > process_bins, std::vector<std::vector<int> > neighbor_bins)
 {
+    std::cout<<"get_boundary_bins START::: "<<std::endl;
     int num_of_processes = process_bins.size();
     std::vector<int>  bin_ids;
     std::vector<int>  neghbors_list;
@@ -212,11 +217,12 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
 
     bin_ids.clear();
     neghbors_list.clear();
+    
   }
  
    
     
-
+std::cout<<"get_boundary_bins END::: "<<std::endl;
 return border_neighbors;
 
 }
