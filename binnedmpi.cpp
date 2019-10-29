@@ -106,17 +106,20 @@ int main( int argc, char **argv )
 
     //call the function to set bin variables
     set_bin_count(n);
-    bin_map = initialize_bin_vector();
-    
-    neighbor_bins = initialize_neighbor_bins();
+     if(rank == 0)
+    {
+        bin_map = initialize_bin_vector();
+        
+        neighbor_bins = initialize_neighbor_bins();
 
 
-    //init_particles1(n, particles,bin_map);
-    init_particles( n, particles);
-bin_particles( n, particles , bin_map);
-            process_bins = assign_bins_to_processes_mpi(n_proc, bin_map);
-            border_neighbors = get_boundary_bins(process_bins, neighbor_bins);
-    
+        //init_particles1(n, particles,bin_map);
+        init_particles( n, particles);
+        bin_particles( n, particles , bin_map);
+        process_bins = assign_bins_to_processes_mpi(n_proc, bin_map);
+        border_neighbors = get_boundary_bins(process_bins, neighbor_bins);
+    }
+        
     
 
 
