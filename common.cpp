@@ -232,71 +232,71 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
      //#pragma omp parallel
     // {
-		 for(int i=0; i<total_bin_count;i++)
-		 { 
-			index =0;
+         for(int i=0; i<total_bin_count;i++)
+         { 
+            index =0;
 
 
-		   if(i%num_of_bins_y != 0)
-		   {
-			//not first column
-			  neighbor_bins[i][index] =  i-1;
-			  index++;
+           if(i%num_of_bins_y != 0)
+           {
+            //not first column
+              neighbor_bins[i][index] =  i-1;
+              index++;
 
-			  if(i >= num_of_bins_y)
-			  {
-				//not first row
-				neighbor_bins[i][index] =  i-1-num_of_bins_y;
-				index++;
-			  }
+              if(i >= num_of_bins_y)
+              {
+                //not first row
+                neighbor_bins[i][index] =  i-1-num_of_bins_y;
+                index++;
+              }
 
-			  if(i < last_row)
-			  {
-				// Not last row
-				neighbor_bins[i][index] =  i-1+num_of_bins_y;
-				index++;
-			  }
-			  
-			 
-		   }
-
-
-		   if((i+1)%num_of_bins_y != 0)
-		   {
-			//not last column
-			  neighbor_bins[i][index] =  i+1;
-			  index++;
-
-			  if(i >= num_of_bins_y)
-			  {
-				//not first row
-				neighbor_bins[i][index] =  i+1-num_of_bins_y;
-				index++;
-			  }
-
-			  if(i < last_row)
-			  {
-				neighbor_bins[i][index] =  i+1+num_of_bins_y;
-				index++;
-			  } 
-			  
-		   }
+              if(i < last_row)
+              {
+                // Not last row
+                neighbor_bins[i][index] =  i-1+num_of_bins_y;
+                index++;
+              }
+              
+             
+           }
 
 
-		   if(i >= num_of_bins_y)
-			  {
-				neighbor_bins[i][index] =  i-num_of_bins_y;
-				index++;
-			  }
+           if((i+1)%num_of_bins_y != 0)
+           {
+            //not last column
+              neighbor_bins[i][index] =  i+1;
+              index++;
 
-			  if(i < last_row)
-			  {
-				neighbor_bins[i][index] =  i+num_of_bins_y;
-				index++;
-			  } 
-			
-		 }
-	 //} //OMP parallel ends
+              if(i >= num_of_bins_y)
+              {
+                //not first row
+                neighbor_bins[i][index] =  i+1-num_of_bins_y;
+                index++;
+              }
+
+              if(i < last_row)
+              {
+                neighbor_bins[i][index] =  i+1+num_of_bins_y;
+                index++;
+              } 
+              
+           }
+
+
+           if(i >= num_of_bins_y)
+              {
+                neighbor_bins[i][index] =  i-num_of_bins_y;
+                index++;
+              }
+
+              if(i < last_row)
+              {
+                neighbor_bins[i][index] =  i+num_of_bins_y;
+                index++;
+              } 
+            
+         }
+     //} //OMP parallel ends
 
     
 
@@ -393,7 +393,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
     int bin_index;
     std::vector<int> particle_list;
-	//#pragma omp for 
+    //#pragma omp for 
     for( int i = 0; i < n; i++ ) 
     {
         //particle_list.clear();
@@ -527,19 +527,19 @@ void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, dou
     double r2 = dx * dx + dy * dy;
     if( r2 > cutoff*cutoff )
         return;
-	if (r2 != 0)
+    if (r2 != 0)
         {
-	   if (r2/(cutoff*cutoff) < *dmin * (*dmin))
-	      *dmin = sqrt(r2)/cutoff;
+       if (r2/(cutoff*cutoff) < *dmin * (*dmin))
+          *dmin = sqrt(r2)/cutoff;
            (*davg) += sqrt(r2)/cutoff;
            (*navg) ++;
         }
-		
+        
     r2 = fmax( r2, min_r*min_r );
     double r = sqrt( r2 );
  
     
-	
+    
     //
     //  very simple short-range repulsive force
     //
