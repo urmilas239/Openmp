@@ -70,10 +70,10 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
 
     int num_bins_per_process =  ceil(bin_count/num_of_processes);
     std::vector<std::vector<int> > process_bins(num_of_processes, std::vector<int>(num_bins_per_process, -1)); 
-    int assigned_bin_count; = 0;
+    int assigned_bin_count = 0;
     int current_process_id = 0;
 
-    for(bin_idex =0; bin_idex< bin_count; bin_count++)
+    for(int bin_idex =0; bin_idex< bin_count; bin_count++)
     {
 
         process_bins.at(current_process_id).push_back(bin_idex);
@@ -110,7 +110,7 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
     int particle_neighbor_index = 0;
     int neighbor_index = 0;
 
-    std::vector<int>  particles_in_neighbor
+    std::vector<int>  particles_in_neighbor;
 
     int neighbors_id;
 
@@ -153,7 +153,7 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
          }
          
 
-        process_ids.clear();
+        
     }
 
 
@@ -184,7 +184,7 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
     int num_of_processes = process_bins.size();
     std::vector<int>  bin_ids;
     std::vector<int>  neghbors_list;
-    std::vector<std::vector<int> > border_neighbors(num_of_processes, std::vector<int>); 
+    std::vector<std::vector<int> > border_neighbors(num_of_processes, std::vector<int>()); 
   
 
   for(int i = 0; i < num_of_processes; i++)
