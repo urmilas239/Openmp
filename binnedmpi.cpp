@@ -91,7 +91,7 @@ int main( int argc, char **argv )
 
 
     MPI_Datatype PARTICLE_BIN_MAP;
-    MPI_Type_contiguous( 11, MPI_INT, &PARTICLE );
+    MPI_Type_contiguous( 11, MPI_INT, &PARTICLE_BIN_MAP );
     MPI_Type_commit( &PARTICLE_BIN_MAP );
 
 
@@ -164,7 +164,7 @@ bin_particles( n, particles , bin_map);
                 form_particles_array_for_MPI(process_bins.at(i), border_neighbors.at(i), bin_map, neighbor_bins, particles_to_send, pbm, n_bins, particles, partition_sizes, partition_offsets);
 
 
-                 MPI_Send(sizeof(particles_to_send)/sizeof(particle_t),1,MPI_INT,i,0,MPI_COMM_WORLD);
+                MPI_Send(sizeof(particles_to_send)/sizeof(particle_t),1,MPI_INT,i,0,MPI_COMM_WORLD);
                 MPI_Send(sizeof(pbm)/sizeof(particle_bin_mapping),1,MPI_INT,i,1,MPI_COMM_WORLD);
                 MPI_Send(sizeof(n_bins)/sizeof(neighbor_bin_mapping),1,MPI_INT,i,2,MPI_COMM_WORLD);
 
