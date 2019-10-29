@@ -74,11 +74,11 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
     std::vector<std::vector<int> > process_bins(num_of_processes, std::vector<int>(num_bins_per_process, -1)); 
     int assigned_bin_count = 0;
     int current_process_id = 0;
-    std::cout<<"bin_count::: "<<bin_count<<" ,num_bins_per_process ::: "<< num_bins_per_process<< " , num_of_processes::: "<< num_of_processes<< std::endl;
+    //std::cout<<"bin_count::: "<<bin_count<<" ,num_bins_per_process ::: "<< num_bins_per_process<< " , num_of_processes::: "<< num_of_processes<< std::endl;
 
     for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
     {
-        std::cout<<" current_process_id ::: "<< current_process_id<<std::endl;
+        //std::cout<<" current_process_id ::: "<< current_process_id<<std::endl;
         process_bins.at(current_process_id).push_back(bin_idex);
         assigned_bin_count++;
         std::cout<<"assigned_bin_count ::: "<< assigned_bin_count<<std::endl;
@@ -195,7 +195,7 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
     std::vector<int>  neghbors_list;
     std::vector<std::vector<int> > border_neighbors(num_of_processes, std::vector<int>()); 
   
-
+  std::cout<<"neighbor_bins size ::: "<< neighbor_bins.size()<<std::endl;
   for(int i = 0; i < num_of_processes; i++)
   {
     bin_ids = process_bins.at(i);
@@ -203,6 +203,8 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
     //Could have repeating values.
     for(int j =0; j < bin_ids.size(); j++)
     {
+
+        std::cout<<"i ::: "<< i << " ,j::"<<j<<std::endl;
         //neghbors_list.push_back(neighbor_bins.at(bin_ids.at(j)));
         std::vector<int>  temp = neighbor_bins.at(bin_ids.at(j));
         neghbors_list.insert(std::end(neghbors_list), std::begin(temp), std::end(temp));
