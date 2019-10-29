@@ -70,7 +70,7 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
     int bin_count = bin_map.size();
 
     //int num_bins_per_process =  ceil(bin_count/num_of_processes);
-    int num_bins_per_process =  (bin_count + num_of_processes - 1) / num_of_processes;
+    int num_bins_per_process =  ((bin_count + num_of_processes - 1) / num_of_processes)+1;
     std::vector<std::vector<int> > process_bins(num_of_processes, std::vector<int>(num_bins_per_process, -1)); 
     int assigned_bin_count = 0;
     int current_process_id = 0;
