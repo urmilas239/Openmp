@@ -7,7 +7,7 @@ CFLAGS = -O3 -std=c++11
 LIBS = 
 
 
-TARGETS = serial binned binnedopenmp openmp mpi autograder
+TARGETS = serial binned binnedopenmp openmp mpi binnedmpi autograder
 
 all:	$(TARGETS)
 
@@ -23,6 +23,8 @@ openmp: openmp.o common.o
 	$(CC) -o $@ $(LIBS) $(OPENMP) openmp.o common.o -lm 
 mpi: mpi.o common.o
 	$(MPCC) -o $@ $(LIBS) $(MPILIBS) mpi.o common.o -lm
+binnedmpi: binnedmpi.o common.o
+	$(MPCC) -o $@ $(LIBS) $(MPILIBS) binnedmpi.o common.o -lm
 
 autograder.o: autograder.cpp common.h
 	$(CC) -c $(CFLAGS) autograder.cpp 
@@ -36,6 +38,8 @@ binned.o: binned.cpp common.h
 	$(CC) -c $(CFLAGS) binned.cpp
 mpi.o: mpi.cpp common.h
 	$(MPCC) -c $(CFLAGS) mpi.cpp
+binnedmpi.o: binnedmpi.cpp common.h
+	$(MPCC) -c $(CFLAGS) binnedmpi.cpp
 common.o: common.cpp common.h
 	$(CC) -c  $(CFLAGS) common.cpp
 
