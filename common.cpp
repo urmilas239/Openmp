@@ -62,6 +62,163 @@ std::vector<std::vector<int> > initialize_bin_vector()
 }
 
 
+//Divides bins(hence particles) across process
+std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map)
+{
+    //total bins
+    int bin_count = bin_map.size();
+
+    int num_bins_per_process =  ceil(bin_count/num_of_processes);
+    std::vector<std::vector<int> > process_bins(num_of_processes, std::vector<int>(num_bins_per_process, -1)); 
+    int assigned_bin_count; = 0;
+    int current_process_id = 0;
+
+    for(bin_idex =0; bin_idex< bin_count; bin_count++)
+    {
+
+        process_bins.at(current_process_id).push_back(bin_idex);
+        assigned_bin_count++;
+        if(assigned_bin_count >= num_bins_per_process)
+        {
+            assigned_bin_count = 0;
+            current_process_id++;
+        }
+    }
+    return process_bins;
+}
+
+
+void form_particles_array_for_MPI(std::vector<int>  bin_ids, 
+    std::vector<int>  boundary_bin_ids, 
+    std::vector<std::vector<int> > bin_map, 
+    std::vector<std::vector<int> > neighbor_bins,  
+    particle_t *particles_to_send, 
+    particle_bin_mapping *pbm, 
+    neighbor_bin_mapping *n_bins, 
+    particle_t *particles, 
+    int *partition_sizes, 
+    int *partition_offsets)
+{
+    //std::vector<int>  bin_ids = process_bins.at(process_id);
+    int num_of_bins_in_curr_proc = bin_ids.size();
+    int particles_per_bin;
+    std::vector<int>  particle_ids;
+    std::vector<int>  neighbor_ids;
+    int neighbors_per_bin;
+    int bin_id;
+    int particle_index = 0;
+    int particle_neighbor_index = 0;
+    int neighbor_index = 0;
+
+    std::vector<int>  particles_in_neighbor
+
+    int neighbors_id;
+
+
+
+    for(int i = 0; i < num_of_bins_in_curr_proc; i++)
+    {
+
+        //iterate through bins in bin_ids, get particle id. fetch those from particles_t array and set it into particles_to_send array
+        //update pbm to contatin offset and #of particle information for each bin
+        bin_id = bin_ids.at(i);
+        particle_ids = bin_map.at(bin_id);
+        particles_per_bin = particle_ids.size();
+
+        pbm[i].bin_id = bin_id;
+        pbm[i].num_particles = particles_per_bin;
+        pbm[i].particle_offset = particle_index;
+        partition_offsets[i] = particle_index;
+        partition_sizes[i] += particles_per_bin;
+
+
+
+        for(int j = 0; j<particles_per_bin; j++ )
+        {
+            particles_to_send[particle_index] = particles[particle_ids.at(j)];
+            particle_index++;
+        }
+        particle_ids.clear();
+
+        
+        //get neighbors of the current bin
+        neighbor_ids = neighbor_bins.at(bin_id);
+        neighbors_per_bin = particle_ids.size(); //number of neighbors
+        
+        for(int j = 0; j<neighbors_per_bin; j++ )
+        {
+            neighbors_id = neighbor_ids.at(j);
+            pbm[i].neighbor_id[j] = neighbors_id;
+            
+         }
+         
+
+        process_ids.clear();
+    }
+
+
+    int num_boundary_bins = boundary_bin_ids.size();
+    for(int i =0; i < num_boundary_bins; i ++)
+    {
+
+            bin_id = boundary_bin_ids.at(i);
+            particles_in_neighbor = bin_map.at(bin_id);
+            particles_per_bin = particles_in_neighbor.size();
+            n_bins[i].neighbor_bin_id = bin_id;
+            n_bins[i].num_particles = particles_per_bin;
+            n_bins[i].particle_offset = particle_neighbor_index; 
+            //neighbor_index++;
+
+            for(int k = 0; k<particles_per_bin; k++ )
+            {
+                particles_to_send[particle_index] = particles[particles_in_neighbor.at(k)];
+                particle_index++;
+            }
+    }
+
+}
+
+
+std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > process_bins, std::vector<std::vector<int> > neighbor_bins)
+{
+    int num_of_processes = process_bins.size();
+    std::vector<int>  bin_ids;
+    std::vector<int>  neghbors_list;
+    std::vector<std::vector<int> > border_neighbors(num_of_processes, std::vector<int>); 
+  
+
+  for(int i = 0; i < num_of_processes; i++)
+  {
+    bin_ids = process_bins.at(i);
+    //neghbors_list has the list at all neighbors of bins in bin_ids,
+    //Could have repeating values.
+    for(int j =0; j < bin_ids.size(); j++)
+    {
+        neghbors_list.push_back(neighbor_bins.at(bin_ids.at(j)));
+    }
+
+
+    for(int k =0; k < neghbors_list.size(); k++)
+    {
+        if(std::find(bin_ids.begin(), bin_ids.end(), neghbors_list.at(k)) == bin_ids.end())
+        {
+            //neighbor doesnt exist in the bin list. Add it
+            border_neighbors.at(i).push_back(neghbors_list.at(k));
+        }
+    }
+
+    bin_ids.clear();
+    neghbors_list.clear();
+  }
+ 
+   
+    
+
+return border_neighbors;
+
+}
+
+
 std::vector<std::vector<int> > initialize_neighbor_bins()
 {
      //std::cout << ":::IN neighbor_bins::: " << std::endl;
@@ -214,6 +371,19 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
      bin_map.erase(bin_map.begin() + bin_index);
      bin_map.insert(bin_map.begin()+bin_index, particle_list);
 
+ }
+
+
+ void mpi_bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map)
+ {
+     int bin_index;
+
+     for( int i = 0; i < n; i++ ) 
+    {
+         bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
+         bin_map.at(bin_index).push_back(i);
+         
+    }
  }
 
 

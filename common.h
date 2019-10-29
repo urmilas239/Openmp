@@ -27,6 +27,23 @@ typedef struct
 } particle_t;
 
 
+typedef struct 
+{
+	int bin_id;
+	int num_particles;
+	int particle_offset;
+	int neighbor_id[8] ={-1, -1,-1,-1,-1,-1,-1,-1};
+}particle_bin_mapping;
+
+
+typedef struct 
+{
+	int neighbor_bin_id;
+	int num_particles;
+	int particle_offset;
+}neighbor_bin_mapping;
+
+
 //Added 
 
  void set_bin_count(int n);
@@ -49,6 +66,20 @@ void move( particle_t &p );
 void move1( particle_t &p,  std::vector<std::vector<int> > &bin_map);
 void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map);
 
+//MPI Functions
+void form_particles_array_for_MPI(std::vector<int>  bin_ids, 
+    std::vector<int>  boundary_bin_ids, 
+    std::vector<std::vector<int> > bin_map, 
+    std::vector<std::vector<int> > neighbor_bins,  
+    particle_t *particles_to_send, 
+    particle_bin_mapping *pbm, 
+    neighbor_bin_mapping *n_bins, 
+    particle_t *particles, 
+    int *partition_sizes, 
+    int *partition_offsets);
+
+std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > process_bins, std::vector<std::vector<int> > neighbor_bins);
+std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map);
 
 //
 //  I/O routines
