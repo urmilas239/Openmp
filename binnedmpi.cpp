@@ -25,6 +25,10 @@ int main( int argc, char **argv )
     int rnavg; 
 
 
+    MPI_Status status; 
+
+
+
     if( find_option( argc, argv, "-h" ) >= 0 )
     {
         printf( "Options:\n" );
@@ -72,6 +76,8 @@ int main( int argc, char **argv )
     particle_t *particles_to_send;
     particle_t *particles_bin_map;
     particle_t *particles_neighbor_map;
+    particle_bin_mapping *pbm; //Number of bins in the current process
+    neighbor_bin_mapping *n_bins; //Number of neighbors in the current process
     int *partition_sizes; //= (int*) malloc( n_proc * sizeof(int));
     int *partition_offsets; // = (int*) malloc( (n_proc+1) * sizeof(int) );
 
@@ -128,9 +134,8 @@ bin_particles( n, particles , bin_map);
     //
     double simulation_time = read_timer( );
 
-   particle_t *particles_to_send;
-   particle_bin_mapping *pbm;
-   neighbor_bin_mapping *n_bins;
+   
+   
 	
    
 
@@ -152,7 +157,7 @@ bin_particles( n, particles , bin_map);
             
 
              for(int i=0;i<n_proc;i++)
-                
+
              {
                 
                 //form_particles_array_for_MPI(process_bins.at(i), bin_map, neighbor_bins, particles_to_send, particles_neighbors, pbm, n_bins, particles,partition_sizes,partition_offsets);
@@ -176,15 +181,15 @@ bin_particles( n, particles , bin_map);
        
         
 
-         MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-         MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-         MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
+         MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+         MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+         MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
 
 
 
-         MPI_Recv(particles_in_proc, num_of_particles_in_proc, PARTICLE, 0, 3, MPI_COMM_WORLD);
-         MPI_Recv(bins_in_proc, num_of_bins_in_proc, PARTICLE_BIN_MAP, 0, 4, MPI_COMM_WORLD);
-         MPI_Recv(neighbors_in_proc, num_of_neighbors_in_proc, NEIGHBOR_BIN_MAP, 0, 5, MPI_COMM_WORLD);
+         MPI_Recv(particles_to_send, num_of_particles_in_proc, PARTICLE, 0, 3, MPI_COMM_WORLD, &status);
+         MPI_Recv(pbm, num_of_bins_in_proc, PARTICLE_BIN_MAP, 0, 4, MPI_COMM_WORLD, &status);
+         MPI_Recv(n_bins, num_of_neighbors_in_proc, NEIGHBOR_BIN_MAP, 0, 5, MPI_COMM_WORLD, &status);
 
 
 
@@ -198,7 +203,7 @@ bin_particles( n, particles , bin_map);
         neighbor_bin_mapping nb;
         for(int temp_index = 0;temp_index < num_of_bins_in_proc; temp_index++)
         {
-            pb = bins_in_proc[temp_index];
+            pb = pbm[temp_index];
             nb.neighbor_bin_id = pb.bin_id;
             nb.num_particles = pb.num_particles;
             nb.particle_offset = pb.particle_offset;
@@ -209,7 +214,7 @@ bin_particles( n, particles , bin_map);
 
         for(int temp_index = 0;temp_index < num_of_neighbors_in_proc; temp_index++)
         {
-            nb = neighbors_in_proc[temp_index];
+            nb = n_bins[temp_index];
             neighbor_map.insert ( std::pair<int, neighbor_bin_mapping>(nb.neighbor_bin_id,nb) );
 
         }
@@ -231,9 +236,9 @@ bin_particles( n, particles , bin_map);
             particle_t *particles_updated;
             //int neighbor_id;
             
-            for( int i = 0; i < bins_in_proc; i++ )
+            for( int i = 0; i < num_of_bins_in_proc; i++ )
             {
-                pb = bins_in_proc[i];
+                pb = pbm[i];
                 current_bin_index = pb.bin_id;
                 p_offset = pb.particle_offset;
                 p_count = pb.num_particles;
@@ -250,7 +255,7 @@ bin_particles( n, particles , bin_map);
                              nb =  neighbor_map.find(n_ids[k]);
                             for(int k =0; k < nb.num_particles; k++)
                             {
-                                apply_force( particles_in_proc[p_offset+j], particles_in_proc[nb.particle_offset + k], &dmin, &davg, &navg );
+                                apply_force( particles_to_send[p_offset+j], particles_to_send[nb.particle_offset + k], &dmin, &davg, &navg );
                             }
 
                         }
@@ -269,17 +274,17 @@ bin_particles( n, particles , bin_map);
         //  move particles
         //
         int temp_offset = 0;
-        for( int i = 0; i < bins_in_proc; i++ )
+        for( int i = 0; i < num_of_bins_in_proc; i++ )
         {
-            pb = bins_in_proc[i];
+            pb = pbm[i];
             current_bin_index = pb.bin_id;
             p_offset = pb.particle_offset;
             p_count = pb.num_particles;
 
             for(int j = 0; j < p_count ; j++)
             {
-                move( particles_in_proc[p_offset+j]);
-                particles_updated[temp_offset] = particles_in_proc[p_offset+j];
+                move( particles_to_send[p_offset+j]);
+                particles_updated[temp_offset] = particles_to_send[p_offset+j];
                 temp_offset++;
             }
         }
