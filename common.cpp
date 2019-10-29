@@ -195,7 +195,8 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
     for(int j =0; j < bin_ids.size(); j++)
     {
         //neghbors_list.push_back(neighbor_bins.at(bin_ids.at(j)));
-        neghbors_list.insert(std::end(neghbors_list), neighbor_bins.at(bin_ids.at(j)));
+        std::vector<int>  temp = neighbor_bins.at(bin_ids.at(j));
+        neghbors_list.insert(std::end(neghbors_list), std::begin(temp), std::end(temp));
     }
 
 
