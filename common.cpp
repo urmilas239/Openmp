@@ -73,10 +73,11 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
     std::vector<std::vector<int> > process_bins(num_of_processes, std::vector<int>(num_bins_per_process, -1)); 
     int assigned_bin_count = 0;
     int current_process_id = 0;
+    std::cout<<"num_bins_per_process ::: "<< num_bins_per_process<< " , num_of_processes::: "<< num_of_processes<< std::endl;
 
     for(int bin_idex =0; bin_idex< bin_count; bin_count++)
     {
-
+        std::cout<<"assign_bins_to_processes_mpi current_process_id ::: "<< current_process_id<<std::endl;
         process_bins.at(current_process_id).push_back(bin_idex);
         assigned_bin_count++;
         if(assigned_bin_count >= num_bins_per_process)
@@ -84,6 +85,7 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
             assigned_bin_count = 0;
             current_process_id++;
         }
+        std::cout<<"assigned_bin_count ::: "<< assigned_bin_count<<std::endl;
     }
     std::cout<<"assign_bins_to_processes_mpi END::: "<<std::endl;
     return process_bins;
@@ -217,7 +219,7 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
 
     bin_ids.clear();
     neghbors_list.clear();
-    
+
   }
  
    
