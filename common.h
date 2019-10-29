@@ -23,7 +23,7 @@ typedef struct
   double vy;
   double ax;
   double ay;
-  int index;
+  double index;
 } particle_t;
 
 
