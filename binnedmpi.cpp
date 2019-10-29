@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <math.h>
 #include <vector>
+#include <map>
 #include <iostream>
 #include "common.h"
 
@@ -173,22 +174,22 @@ bin_particles( n, particles , bin_map);
        
         
 
-        int MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_Status * status);
-        int MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_Status * status);
-        int MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, MPI_Status * status);
+        int MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+        int MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        int MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
 
 
 
-        int MPI_Recv(particles_in_proc, num_of_particles_in_proc, PARTICLE, 0, 3, MPI_COMM_WORLD, MPI_Status * status);
-        int MPI_Recv(bins_in_proc, num_of_bins_in_proc, PARTICLE_BIN_MAP, 0, 4, MPI_COMM_WORLD, MPI_Status * status);
-        int MPI_Recv(neighbors_in_proc, num_of_neighbors_in_proc, NEIGHBOR_BIN_MAP, 0, 5, MPI_COMM_WORLD, MPI_Status * status);
+        int MPI_Recv(particles_in_proc, num_of_particles_in_proc, PARTICLE, 0, 3, MPI_COMM_WORLD);
+        int MPI_Recv(bins_in_proc, num_of_bins_in_proc, PARTICLE_BIN_MAP, 0, 4, MPI_COMM_WORLD);
+        int MPI_Recv(neighbors_in_proc, num_of_neighbors_in_proc, NEIGHBOR_BIN_MAP, 0, 5, MPI_COMM_WORLD);
 
 
 
 
 
         //Add bin ids (in current process and the boundary bins) from to a map - for ease of searching
-        map<int, neighbor_bin_mapping> neighbor_map; 
+        std::map<int, neighbor_bin_mapping> neighbor_map; 
 
 
         particle_bin_mapping pb;
@@ -224,7 +225,7 @@ bin_particles( n, particles , bin_map);
             int current_bin_index;
             int p_offset;
             int p_count;
-            int n_ids[8];
+            int *n_ids;
             particle_t *particles_updated;
             //int neighbor_id;
             
