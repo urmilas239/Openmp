@@ -252,7 +252,7 @@ bin_particles( n, particles , bin_map);
 
                         if(n_ids[k] != -1)
                         {
-                             nb =  neighbor_map.find(n_ids[k]);
+                             nb =  neighbor_map.find(n_ids[k])->second;
                             for(int k =0; k < nb.num_particles; k++)
                             {
                                 apply_force( particles_to_send[p_offset+j], particles_to_send[nb.particle_offset + k], &dmin, &davg, &navg );
