@@ -152,9 +152,11 @@ bin_particles( n, particles , bin_map);
             
 
              for(int i=0;i<n_proc;i++)
+                
              {
                 
-                form_particles_array_for_MPI(process_bins.at(i), bin_map, neighbor_bins, particles_to_send, particles_neighbors, pbm, n_bins, particles,partition_sizes,partition_offsets);
+                //form_particles_array_for_MPI(process_bins.at(i), bin_map, neighbor_bins, particles_to_send, particles_neighbors, pbm, n_bins, particles,partition_sizes,partition_offsets);
+                form_particles_array_for_MPI(process_bins.at(i), border_neighbors.at(i), bin_map, neighbor_bins, particles_to_send, pbm, n_bins, particles, partition_sizes, partition_offsets);
 
 
                  MPI_Send(sizeof(particles_to_send)/sizeof(particle_t),1,MPI_INT,i,0,MPI_COMM_WORLD);
@@ -174,15 +176,15 @@ bin_particles( n, particles , bin_map);
        
         
 
-        int MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-        int MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        int MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
+         MPI_Recv(num_of_particles_in_proc, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+         MPI_Recv(num_of_bins_in_proc, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+         MPI_Recv(num_of_neighbors_in_proc, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
 
 
 
-        int MPI_Recv(particles_in_proc, num_of_particles_in_proc, PARTICLE, 0, 3, MPI_COMM_WORLD);
-        int MPI_Recv(bins_in_proc, num_of_bins_in_proc, PARTICLE_BIN_MAP, 0, 4, MPI_COMM_WORLD);
-        int MPI_Recv(neighbors_in_proc, num_of_neighbors_in_proc, NEIGHBOR_BIN_MAP, 0, 5, MPI_COMM_WORLD);
+         MPI_Recv(particles_in_proc, num_of_particles_in_proc, PARTICLE, 0, 3, MPI_COMM_WORLD);
+         MPI_Recv(bins_in_proc, num_of_bins_in_proc, PARTICLE_BIN_MAP, 0, 4, MPI_COMM_WORLD);
+         MPI_Recv(neighbors_in_proc, num_of_neighbors_in_proc, NEIGHBOR_BIN_MAP, 0, 5, MPI_COMM_WORLD);
 
 
 
