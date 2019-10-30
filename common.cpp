@@ -62,6 +62,47 @@ std::vector<std::vector<int> > initialize_bin_vector()
 }
 
 
+
+
+//Divides bins(hence particles) across process
+std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map)
+{
+    std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
+    //total bins
+    int bin_count = bin_map.size();
+
+    //int num_bins_per_process =  ceil(bin_count/num_of_processes);
+    int num_bins_per_process =  ((bin_count + num_of_processes - 1) / num_of_processes);
+    std::vector<int> process_bins; 
+    int assigned_bin_count = 0;
+    int current_process_id = 0;
+    //std::cout<<"bin_count::: "<<bin_count<<" ,num_bins_per_process ::: "<< num_bins_per_process<< " , num_of_processes::: "<< num_of_processes<< std::endl;
+
+    for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
+    {
+        //std::cout<<" current_process_id ::: "<< current_process_id<<std::endl;
+        bin_process_map.at(bin_idex) = current_process_id;
+        if(current_process_id == current_process)
+        {
+            process_bins.push_back(bin_idex);
+        }
+        
+        assigned_bin_count++;
+        //std::cout<<"assigned_bin_count ::: "<< assigned_bin_count<<std::endl;
+        if(assigned_bin_count > num_bins_per_process)
+        {
+            assigned_bin_count = 0;
+            current_process_id++;
+        }
+        
+    }
+    std::cout<<"assign_bins_to_processes_mpi END::: "<<std::endl;
+    return process_bins;
+}
+
+
+
+
 //Divides bins(hence particles) across process
 std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map)
 {
@@ -191,6 +232,37 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
     }
 
     std::cout<<"form_particles_array_for_MPI END::: "<<std::endl;
+
+}
+
+
+
+std::vector<int> get_boundary_bins_for_curr_process(std::vector<int > process_bins, std::vector<std::vector<int> > neighbor_bins)
+{
+    int num_of_bins_in_curr_proc = process_bins.size();
+    for(int j =0; j < num_of_bins_in_curr_proc; j++)
+    {
+
+        //std::cout<<"i ::: "<< i << " ,j::"<<j<< " ,bin_ids.at(j):::"<< bin_ids.at(j)<< std::endl;
+        //neghbors_list.push_back(neighbor_bins.at(bin_ids.at(j)));
+        if(process_bins.at(j) != -1)
+        {
+            std::vector<int>  temp = neighbor_bins.at(process_bins.at(j));
+            neghbors_list.insert(std::end(neghbors_list), std::begin(temp), std::end(temp));
+        }
+        
+    }
+
+
+    for(int k =0; k < neghbors_list.size(); k++)
+    {
+        if(std::find(process_bins.begin(), process_bins.end(), neghbors_list.at(k)) == process_bins.end())
+        {
+            //neighbor doesnt exist in the bin list. Add it
+            border_neighbors.push_back(neghbors_list.at(k));
+
+        }
+    }
 
 }
 

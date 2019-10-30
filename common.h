@@ -80,6 +80,13 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
 std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > process_bins, std::vector<std::vector<int> > neighbor_bins);
 std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map);
 
+
+
+
+//MPI alternate logic functions
+std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<bin> bin_process_map);
+std::vector<int> get_boundary_bins_for_curr_process(std::vector<int > process_bins, std::vector<std::vector<int> > neighbor_bins);
+
 //
 //  I/O routines
 //
