@@ -239,6 +239,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
 
 std::vector<int> get_boundary_bins_for_curr_process(std::vector<int > process_bins, std::vector<std::vector<int> > neighbor_bins)
 {
+     std::vector<int>  neghbors_list;
     int num_of_bins_in_curr_proc = process_bins.size();
     for(int j =0; j < num_of_bins_in_curr_proc; j++)
     {
