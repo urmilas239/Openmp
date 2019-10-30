@@ -147,7 +147,9 @@ int main( int argc, char **argv )
    
 
     
-
+     int partition_size_per_rank = 0;
+     int npm_size =0;
+     int pbm_size = 0;
     //std::cout<<"numthreads:::"<<numthreads<<std::endl;
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -169,25 +171,26 @@ int main( int argc, char **argv )
 
              {
                 
-
-                 n_bins = (neighbor_bin_mapping*) malloc( border_neighbors.at(i).size() * sizeof(neighbor_bin_mapping) );
-                 pbm = (particle_bin_mapping*) malloc( n_proc * sizeof(particle_bin_mapping) );
+                 pbm_size = process_bins.at(i).size();
+                 npm_size = border_neighbors.at(i).size();
+                 n_bins = (neighbor_bin_mapping*) malloc( npm_size * sizeof(neighbor_bin_mapping) );
+                 pbm = (particle_bin_mapping*) malloc( pbm_size * sizeof(particle_bin_mapping) );
+                 partition_size_per_rank = 0;
                 //form_particles_array_for_MPI(process_bins.at(i), bin_map, neighbor_bins, particles_to_send, particles_neighbors, pbm, n_bins, particles,partition_sizes,partition_offsets);
-                form_particles_array_for_MPI(process_bins.at(i), border_neighbors.at(i), bin_map, neighbor_bins, particles_to_send, pbm, n_bins, particles, partition_sizes, partition_offsets);
+                form_particles_array_for_MPI(process_bins.at(i), border_neighbors.at(i), bin_map, neighbor_bins, particles_to_send, pbm, n_bins, particles, partition_size_per_rank);
                 int particles_to_send_size = 0;
-                for(int k=0;k<n_proc;k++)
-                {
-                    particles_to_send_size += partition_sizes[k];
-                }
+                
+                partition_sizes[i] = partition_size_per_rank;
+                partition_offsets[i+1] = partition_offsets[i] + partition_size_per_rank-1;
+                //iterate through npm and pbm and get the count of arrays to send.
 
-
-                MPI_Send(particles_to_send_size,1,MPI_INT,i,0,MPI_COMM_WORLD);
-                MPI_Send(sizeof(pbm)/sizeof(particle_bin_mapping),1,MPI_INT,i,1,MPI_COMM_WORLD);
-                MPI_Send(sizeof(n_bins)/sizeof(neighbor_bin_mapping),1,MPI_INT,i,2,MPI_COMM_WORLD);
+                MPI_Send(partition_size_per_rank,1,MPI_INT,i,0,MPI_COMM_WORLD);
+                MPI_Send(pbm_size,1,MPI_INT,i,1,MPI_COMM_WORLD);
+                MPI_Send(npm_size,1,MPI_INT,i,2,MPI_COMM_WORLD);
 
                 MPI_Send(particles_to_send,particles_to_send_size,PARTICLE,i,3,MPI_COMM_WORLD);
-                MPI_Send(pbm,sizeof(pbm)/sizeof(particle_bin_mapping),PARTICLE_BIN_MAP,i,4,MPI_COMM_WORLD);
-                MPI_Send(n_bins,sizeof(n_bins)/sizeof(neighbor_bin_mapping),NEIGHBOR_BIN_MAP,i,5,MPI_COMM_WORLD);
+                MPI_Send(pbm,pbm_size,PARTICLE_BIN_MAP,i,4,MPI_COMM_WORLD);
+                MPI_Send(n_bins,npm_size,NEIGHBOR_BIN_MAP,i,5,MPI_COMM_WORLD);
 
                 //send to current_process
              }

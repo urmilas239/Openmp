@@ -102,8 +102,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
     particle_bin_mapping *pbm,
     neighbor_bin_mapping *n_bins,
     particle_t *particles, 
-    int *partition_sizes,
-    int *partition_offsets)
+    int &partition_size_per_rank)
 {
     std::cout<<"form_particles_array_for_MPI START::: "<<std::endl;
     //std::vector<int>  bin_ids = process_bins.at(process_id);
@@ -133,6 +132,9 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
 
         if(particle_ids.empty())
         {
+             pbm[i].bin_id = bin_id;
+        pbm[i].num_particles = 0;
+        pbm[i].particle_offset = particle_index;
             continue;
         }
         particles_per_bin = particle_ids.size();
@@ -141,9 +143,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
         pbm[i].bin_id = bin_id;
         pbm[i].num_particles = particles_per_bin;
         pbm[i].particle_offset = particle_index;
-        partition_offsets[i] = particle_index;
-        std::cout<<"Partition offsets: "<<partition_offsets[i]<<std::endl;
-        partition_sizes[i] += particles_per_bin;
+        partition_size_per_rank += particles_per_bin;
 
 
 
@@ -170,7 +170,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
         
     }
 
-
+    //Assumption num_boundary_bins cannot be zero since all process will have boundary bins
     int num_boundary_bins = boundary_bin_ids.size();
     for(int i =0; i < num_boundary_bins; i ++)
     {
