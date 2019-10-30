@@ -67,10 +67,10 @@ void move1( particle_t &p,  std::vector<std::vector<int> > &bin_map);
 void bin_particles(int n, particle_t *p ,  std::vector<std::vector<int> > &bin_map);
 
 //MPI Functions
-void form_particles_array_for_MPI(std::vector<int>  bin_ids, 
-    std::vector<int>  boundary_bin_ids, 
-    std::vector<std::vector<int> > bin_map, 
-    std::vector<std::vector<int> > neighbor_bins,  
+void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
+    std::vector<int>  &boundary_bin_ids,
+    std::vector<std::vector<int> > &bin_map,
+    std::vector<std::vector<int> > &neighbor_bins,
     particle_t *particles_to_send, 
     particle_bin_mapping *pbm,
     neighbor_bin_mapping *n_bins,

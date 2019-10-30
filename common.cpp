@@ -94,10 +94,10 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
 }
 
 
-void form_particles_array_for_MPI(std::vector<int>  bin_ids, 
-    std::vector<int>  boundary_bin_ids, 
-    std::vector<std::vector<int> > bin_map, 
-    std::vector<std::vector<int> > neighbor_bins,  
+void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
+    std::vector<int>  &boundary_bin_ids,
+    std::vector<std::vector<int> > &bin_map,
+    std::vector<std::vector<int> > &neighbor_bins,
     particle_t *particles_to_send, 
     particle_bin_mapping *pbm,
     neighbor_bin_mapping *n_bins,
@@ -141,7 +141,7 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
         pbm[i].bin_id = bin_id;
         pbm[i].num_particles = particles_per_bin;
         pbm[i].particle_offset = particle_index;
-        partition_offsets[i] =0;// particle_index;
+        partition_offsets[i] = particle_index;
         std::cout<<"Partition offsets: "<<partition_offsets[i]<<std::endl;
         partition_sizes[i] += particles_per_bin;
 
