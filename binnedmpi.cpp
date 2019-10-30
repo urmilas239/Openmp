@@ -104,8 +104,8 @@ int main( int argc, char **argv )
     //init_particles1(n, particles,bin_map);
     init_particles( n, particles);
     bin_particles( n, particles , bin_map);
-    process_bins=assign_bins_to_current_process_mpi(int n_proc, rank, bin_map, bin_process_map);
-    border_neighbors = get_boundary_bins(process_bins, neighbor_bins);
+    process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map);
+    border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
 
     
     //
