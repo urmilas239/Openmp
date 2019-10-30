@@ -99,10 +99,10 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
     std::vector<std::vector<int> > bin_map, 
     std::vector<std::vector<int> > neighbor_bins,  
     particle_t *particles_to_send, 
-    particle_bin_mapping *pbm, 
-    neighbor_bin_mapping *n_bins, 
+    particle_bin_mapping *pbm,
+    neighbor_bin_mapping *n_bins,
     particle_t *particles, 
-    int *partition_sizes, 
+    int *partition_sizes,
     int *partition_offsets)
 {
     std::cout<<"form_particles_array_for_MPI START::: "<<std::endl;
@@ -130,12 +130,19 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
         //update pbm to contatin offset and #of particle information for each bin
         bin_id = bin_ids.at(i);
         particle_ids = bin_map.at(bin_id);
+
+        if(particle_ids.empty())
+        {
+            continue;
+        }
         particles_per_bin = particle_ids.size();
+
 
         pbm[i].bin_id = bin_id;
         pbm[i].num_particles = particles_per_bin;
         pbm[i].particle_offset = particle_index;
-        partition_offsets[i] = particle_index;
+        partition_offsets[i] =0;// particle_index;
+        std::cout<<"Partition offsets: "<<partition_offsets[i]<<std::endl;
         partition_sizes[i] += particles_per_bin;
 
 
@@ -173,7 +180,7 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
             particles_per_bin = particles_in_neighbor.size();
             n_bins[i].neighbor_bin_id = bin_id;
             n_bins[i].num_particles = particles_per_bin;
-            n_bins[i].particle_offset = particle_neighbor_index; 
+            n_bins[i].particle_offset = particle_neighbor_index;
             //neighbor_index++;
 
             for(int k = 0; k<particles_per_bin; k++ )
@@ -182,6 +189,7 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
                 particle_index++;
             }
     }
+
     std::cout<<"form_particles_array_for_MPI END::: "<<std::endl;
 
 }
@@ -204,7 +212,7 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
     for(int j =0; j < bin_ids.size(); j++)
     {
 
-        std::cout<<"i ::: "<< i << " ,j::"<<j<< " ,bin_ids.at(j):::"<< bin_ids.at(j)<< std::endl;
+        //std::cout<<"i ::: "<< i << " ,j::"<<j<< " ,bin_ids.at(j):::"<< bin_ids.at(j)<< std::endl;
         //neghbors_list.push_back(neighbor_bins.at(bin_ids.at(j)));
         if(bin_ids.at(j) != -1)
         {
@@ -241,7 +249,7 @@ return border_neighbors;
 std::vector<std::vector<int> > initialize_neighbor_bins()
 {
      //std::cout << ":::IN neighbor_bins::: " << std::endl;
-     std::vector<std::vector<int> > neighbor_bins(total_bin_count, std::vector<int>(8, -1)); 
+     std::vector<std::vector<int> > neighbor_bins(total_bin_count, std::vector<int>(8));
 
      //std::cout << ":::neighbor_bins.size()::: " << neighbor_bins.size()<<std::endl;
      int index;
@@ -349,7 +357,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     std::cout<< "n::" <<n<<std::endl;
     std::cout<< "size::" <<size<<std::endl;
 
-    bin_size = cutoff;
+    bin_size = cutoff*10;
     std::cout<< "bin_size::" <<bin_size<<std::endl;
     num_of_bins_x = ceil(size/bin_size);
     std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;

@@ -40,7 +40,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 1000 );
+    int n = read_int( argc, argv, "-n", 5000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -73,13 +73,13 @@ int main( int argc, char **argv )
 
 
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
-    particle_t *particles_to_send;
-    particle_t *particles_bin_map;
-    particle_t *particles_neighbor_map;
+    //particles_to_send will be smaller than n. Initial allocation. Check for offset before MPI_send
+    particle_t *particles_to_send=(particle_t*) malloc( n * sizeof(particle_t) );
+
     particle_bin_mapping *pbm; //Number of bins in the current process
     neighbor_bin_mapping *n_bins; //Number of neighbors in the current process
-    int *partition_sizes; //= (int*) malloc( n_proc * sizeof(int));
-    int *partition_offsets; // = (int*) malloc( (n_proc+1) * sizeof(int) );
+    int *partition_sizes= (int*) calloc( n_proc , sizeof(int));
+    int *partition_offsets = (int*) calloc( (n_proc) , sizeof(int) );
 
 
     MPI_Datatype PARTICLE;
@@ -106,8 +106,10 @@ int main( int argc, char **argv )
 
     //call the function to set bin variables
     set_bin_count(n);
+
+    // All initialization calls happens in rank 0
      if(rank == 0)
-    {
+      {
         bin_map = initialize_bin_vector();
         
         neighbor_bins = initialize_neighbor_bins();
@@ -118,7 +120,9 @@ int main( int argc, char **argv )
         bin_particles( n, particles , bin_map);
         process_bins = assign_bins_to_processes_mpi(n_proc, bin_map);
         border_neighbors = get_boundary_bins(process_bins, neighbor_bins);
-    }
+
+     std::cout<<" " <<std::endl;
+     }
         
     
 
@@ -156,22 +160,32 @@ int main( int argc, char **argv )
             {
                 bin_map = initialize_bin_vector();
                 bin_particles( n, particles , bin_map);
+
             }
+            std::cout<<"bin_map.size():::"<<bin_map.size()<<std::endl;
             
 
              for(int i=0;i<n_proc;i++)
 
              {
                 
+
+                 n_bins = (neighbor_bin_mapping*) malloc( border_neighbors.at(i).size() * sizeof(neighbor_bin_mapping) );
+                 pbm = (particle_bin_mapping*) malloc( n_proc * sizeof(particle_bin_mapping) );
                 //form_particles_array_for_MPI(process_bins.at(i), bin_map, neighbor_bins, particles_to_send, particles_neighbors, pbm, n_bins, particles,partition_sizes,partition_offsets);
                 form_particles_array_for_MPI(process_bins.at(i), border_neighbors.at(i), bin_map, neighbor_bins, particles_to_send, pbm, n_bins, particles, partition_sizes, partition_offsets);
+                int particles_to_send_size = 0;
+                for(int k=0;k<n_proc;k++)
+                {
+                    particles_to_send_size += partition_sizes[k];
+                }
 
 
-                MPI_Send(sizeof(particles_to_send)/sizeof(particle_t),1,MPI_INT,i,0,MPI_COMM_WORLD);
+                MPI_Send(particles_to_send_size,1,MPI_INT,i,0,MPI_COMM_WORLD);
                 MPI_Send(sizeof(pbm)/sizeof(particle_bin_mapping),1,MPI_INT,i,1,MPI_COMM_WORLD);
                 MPI_Send(sizeof(n_bins)/sizeof(neighbor_bin_mapping),1,MPI_INT,i,2,MPI_COMM_WORLD);
 
-                MPI_Send(particles_to_send,sizeof(particles_to_send)/sizeof(particle_t),PARTICLE,i,3,MPI_COMM_WORLD);
+                MPI_Send(particles_to_send,particles_to_send_size,PARTICLE,i,3,MPI_COMM_WORLD);
                 MPI_Send(pbm,sizeof(pbm)/sizeof(particle_bin_mapping),PARTICLE_BIN_MAP,i,4,MPI_COMM_WORLD);
                 MPI_Send(n_bins,sizeof(n_bins)/sizeof(neighbor_bin_mapping),NEIGHBOR_BIN_MAP,i,5,MPI_COMM_WORLD);
 

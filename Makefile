@@ -3,7 +3,7 @@
 CC = g++
 MPCC = mpicxx
 OPENMP = -fopenmp 
-CFLAGS = -O3 -std=c++11
+CFLAGS = -O3 -std=c++11 -fpermissive
 LIBS = 
 
 

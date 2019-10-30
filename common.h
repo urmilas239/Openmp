@@ -72,10 +72,10 @@ void form_particles_array_for_MPI(std::vector<int>  bin_ids,
     std::vector<std::vector<int> > bin_map, 
     std::vector<std::vector<int> > neighbor_bins,  
     particle_t *particles_to_send, 
-    particle_bin_mapping *pbm, 
-    neighbor_bin_mapping *n_bins, 
+    particle_bin_mapping *pbm,
+    neighbor_bin_mapping *n_bins,
     particle_t *particles, 
-    int *partition_sizes, 
+    int *partition_sizes,
     int *partition_offsets);
 
 std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > process_bins, std::vector<std::vector<int> > neighbor_bins);
