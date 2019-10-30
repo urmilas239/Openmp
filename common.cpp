@@ -67,7 +67,7 @@ std::vector<std::vector<int> > initialize_bin_vector()
 //Divides bins(hence particles) across process
 std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map)
 {
-    std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
+    std::cout<<"assign_bins_to_current_process_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
 
@@ -81,7 +81,7 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
     for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
     {
         //std::cout<<" current_process_id ::: "<< current_process_id<<std::endl;
-        bin_process_map.at(bin_idex) = current_process_id;
+        bin_process_map.push_back(current_process_id);
         if(current_process_id == current_process)
         {
             process_bins.push_back(bin_idex);
@@ -96,7 +96,7 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
         }
         
     }
-    std::cout<<"assign_bins_to_processes_mpi END::: "<<std::endl;
+    std::cout<<"assign_bins_to_current_process_mpi END::: "<<std::endl;
     return process_bins;
 }
 
