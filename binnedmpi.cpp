@@ -110,6 +110,7 @@ int main( int argc, char **argv )
 
     std::vector<int> neighbor_list_collect; 
     std::vector<int> particle_list_collect; 
+    std::vector<int> particle_list_temp;
     int number_of_interacting_particles = 0;
 
     
@@ -137,7 +138,13 @@ int main( int argc, char **argv )
             neighbor_list_collect.push_back(process_bins.at(i));
             for(int j =0; j<neighbor_list_collect.size();j++)
             {
-                particle_list_collect = bin_map.at(neighbor_list_collect.at(i));
+               if(neighbor_list_collect.at(j) != -1)
+               {
+                   particle_list_temp = bin_map.at(neighbor_list_collect.at(j));
+                   particle_list_collect.insert(particle_list_collect.end(), particle_list_temp.begin(), particle_list_temp.end());
+                   particle_list_temp.clear();
+               }
+
             }
 
             number_of_interacting_particles = particle_list_collect.size();
@@ -145,7 +152,7 @@ int main( int argc, char **argv )
             for(int k =0; k<number_of_interacting_particles; k++)
             {
                 particles[particle_list_collect.at(k)].ax = particles[particle_list_collect.at(k)].ay = 0;
-                    for (int l = 0; l < n; l++ )
+                    for (int l = 0; l < number_of_interacting_particles; l++ )
                     {
                         apply_force( particles[particle_list_collect.at(k)], particles[particle_list_collect.at(l)],&dmin,&davg,&navg);
                     }

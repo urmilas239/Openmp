@@ -325,7 +325,7 @@ return border_neighbors;
 std::vector<std::vector<int> > initialize_neighbor_bins()
 {
      //std::cout << ":::IN neighbor_bins::: " << std::endl;
-     std::vector<std::vector<int> > neighbor_bins(total_bin_count, std::vector<int>(8));
+     std::vector<std::vector<int> > neighbor_bins(total_bin_count, std::vector<int>(8, -1));
 
      //std::cout << ":::neighbor_bins.size()::: " << neighbor_bins.size()<<std::endl;
      int index;
