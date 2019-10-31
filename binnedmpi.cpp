@@ -130,12 +130,12 @@ int main( int argc, char **argv )
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
            
             
-        for(i=0;i<process_bins.size();i++)
+        for(int i=0;i<process_bins.size();i++)
         {
             //collect neighbor particle for the current bin.
             neighbor_list_collect = neighbor_bins.at(process_bins.at(i));
-            neighbor_list_collect.push_back(process_bins.at(i))
-            for(int j = 0; j<neighbor_list_collect.size();j++)
+            neighbor_list_collect.push_back(process_bins.at(i));
+            for(int j =0; j<neighbor_list_collect.size();j++)
             {
                 particle_list_collect = bin_map.at(neighbor_list_collect.at(i));
             }
