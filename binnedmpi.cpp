@@ -221,6 +221,12 @@ int main( int argc, char **argv )
             }
            // bin_map.clear();
             rebin = true;
+
+            for(int i = 0; i < n_proc; i++)
+            {
+               std::cout<<"i :: "<<i<<" ,partition_sizes "<<partition_sizes[i]<<", partition_offsets "<<partition_offsets[i]<<std::endl;
+            }
+            std::cout<<"partition_offsets "<<partition_offsets[n_proc]<<std::endl;
             MPI_Allgatherv(particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
            }
      }

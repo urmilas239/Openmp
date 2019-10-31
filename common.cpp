@@ -118,6 +118,8 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
     int assigned_bin_count = 0;
     int current_process_id = 0;
     int num_of_particles_in_curr_process = 0;
+    //int *partition_offset1 = new int[num_of_processes+1];
+    //int *partition_sizes1 = new int[num_of_processes];
     
     for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
     {
@@ -127,16 +129,26 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
         assigned_bin_count++;
         
         if(assigned_bin_count > num_bins_per_process)
+        //if(1)
         {
-            partition_offset[current_process_id+1] = num_of_particles_in_curr_process - 1;
-            partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+
+
+            *partition_offset[current_process_id+1] = *(partition_offset[current_process_id]) + num_of_particles_in_curr_process;
+            *partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+             std::cout<<"current_process_id :: "<<current_process_id<<" ,partition_sizes "<<*partition_sizes[current_process_id]<<", partition_offsets "<<*partition_offset[current_process_id]<<std::endl;
             assigned_bin_count = 0;
             current_process_id++;
             process_bins.push_back(num_of_particles_in_curr_process);
             num_of_particles_in_curr_process = 0;
+
         }
-        
+
     }
+    /*for(int i = 0; i < num_of_processes; i++)
+    {
+        std::cout<<"i :: "<<i<<" ,partition_sizes "<<*partition_sizes[i]<<", partition_offsets "<<*partition_offset[i]<<std::endl;
+    }
+    std::cout<<"partition_offsets "<<partition_offset[num_of_processes]<<std::endl;*/
     std::cout<<"get_num_of_particles_in_each_process END::: "<<std::endl;
     //return process_bins;
 
