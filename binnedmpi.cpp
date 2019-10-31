@@ -42,7 +42,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 50 );
+    int n = read_int( argc, argv, "-n", 5000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -119,6 +119,7 @@ int main( int argc, char **argv )
     std::vector<int> neighbor_list_collect; 
     std::vector<int> particle_list_collect; 
     std::vector<int> particle_list_temp;
+
     
 
     
@@ -131,7 +132,8 @@ int main( int argc, char **argv )
     
      int partition_size_per_rank = 0;
      int no_of_particles_in_bin =0;
-     int pbm_size = 0;
+     int prev_k_index = 0;
+     int current_k_index = 0;
     //std::cout<<"numthreads:::"<<numthreads<<std::endl;
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -157,22 +159,29 @@ int main( int argc, char **argv )
 
             no_of_particles_in_bin = particle_list_collect.size();
 
-            for(int k =0; k<no_of_particles_in_bin; k++)
+            particle_list_temp = bin_map.at(process_bins.at(i));
+            particle_list_collect.insert(particle_list_collect.end(), particle_list_temp.begin(), particle_list_temp.end());
+
+            for(int k =0; k<particle_list_temp.size(); k++)
             {
-                particles[particle_list_collect.at(k)].ax = particles[particle_list_collect.at(k)].ay = 0;
+                current_k_index = particle_list_collect.at(k);
+                particles[current_k_index].ax = particles[current_k_index].ay = 0;
                     for (int l = 0; l < no_of_particles_in_bin; l++ )
                     {
-                        apply_force( particles[particle_list_collect.at(k)], particles[particle_list_collect.at(l)],&dmin,&davg,&navg);
-                        particles_acted_upon[particle_index] = particles[particle_list_collect.at(k)];
-                        particle_index++;
+                        apply_force( particles[current_k_index], particles[particle_list_collect.at(l)],&dmin,&davg,&navg);
+
+
                     }
+                    //prev_k_index = current_k_index;
+                    particles_acted_upon[particle_index] = particles[current_k_index];
+                    particle_index++;
             }
 
 
             neighbor_list_collect.clear();
             particle_list_collect.clear();
 
-
+            //std::cout<<"particle_index:: "<<particle_index<<"  ,number_of_interacting_particles::"<<number_of_interacting_particles<<std::endl;
             if( find_option( argc, argv, "-no" ) == -1 )
             {
               
@@ -199,9 +208,9 @@ int main( int argc, char **argv )
                  move( particles_acted_upon[i] );
             }
 
-            MPI_Allgatherv( particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+           // MPI_Allgatherv( particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
            }
-        }
+     }
 
        simulation_time = read_timer( ) - simulation_time;
   
@@ -236,10 +245,10 @@ int main( int argc, char **argv )
     //
     if ( fsum )
         fclose( fsum );
-    free( partition_offsets );
-    free( partition_sizes );
-    free( particles );
-    free(particles_acted_upon);
+   // free( partition_offsets );
+    //free( partition_sizes );
+    //free( particles );
+    //free(particles_acted_upon);
     if( fsave )
         fclose( fsave );
     
