@@ -42,7 +42,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 5000 );
+    int n = read_int( argc, argv, "-n", 50 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -72,6 +72,7 @@ int main( int argc, char **argv )
      int num_of_particles_in_proc;
      int num_of_bins_in_proc;
      int num_of_neighbors_in_proc;
+     bool rebin = false;
 
 
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
@@ -139,6 +140,14 @@ int main( int argc, char **argv )
     {
         MPI_Barrier(MPI_COMM_WORLD);
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
+
+        if(rebin)
+        {
+            bin_particles( n, particles , bin_map);
+           // process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map, number_of_interacting_particles);
+           // border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
+           // get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+        }
            
         particle_index = 0;
         for(int i=0;i<process_bins.size();i++)
@@ -207,8 +216,9 @@ int main( int argc, char **argv )
             {
                  move( particles_acted_upon[i] );
             }
-
-           // MPI_Allgatherv( particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+           // bin_map.clear();
+            rebin = true;
+            MPI_Allgatherv( particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
            }
      }
 
