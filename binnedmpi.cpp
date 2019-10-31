@@ -42,7 +42,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 50 );
+    int n = read_int( argc, argv, "-n", 5000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -143,10 +143,11 @@ int main( int argc, char **argv )
 
         if(rebin)
         {
+            bin_map = initialize_bin_vector();
             bin_particles( n, particles , bin_map);
-           // process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map, number_of_interacting_particles);
-           // border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
-           // get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+            process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map, number_of_interacting_particles);
+            border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
+            get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
         }
            
         particle_index = 0;
