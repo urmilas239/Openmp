@@ -172,6 +172,28 @@ int main( int argc, char **argv )
             neighbor_list_collect.clear();
             particle_list_collect.clear();
 
+
+            if( find_option( argc, argv, "-no" ) == -1 )
+            {
+              
+              MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+              MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+              MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
+
+     
+              if (rank == 0){
+                //
+                // Computing statistical data
+                //
+                if (rnavg) {
+                  absavg +=  rdavg/rnavg;
+                  nabsavg++;
+                }
+                if (rdmin < absmin) absmin = rdmin;
+              }
+            }
+
+
             for( int i = 0; i < number_of_interacting_particles; i++ )
             {
                  move( particles_acted_upon[i] );
@@ -181,62 +203,49 @@ int main( int argc, char **argv )
            
         }
 
-        if( find_option( argc, argv, "-no" ) == -1 )
-        {
-          //
-          // Computing statistical data
-          //
-           if (navg) {
-            absavg +=  davg/navg;
-            nabsavg++;
-          }
+       simulation_time = read_timer( ) - simulation_time;
+  
+    if (rank == 0) {  
+      printf( "n = %d, simulation time = %g seconds", n, simulation_time);
 
-          if (dmin < absmin) absmin = dmin;
-		
-          //
-          //  save if necessary
-          //
-           if( fsave && (step%SAVEFREQ) == 0 )
-              save( fsave, n, particles );
-        }
+      if( find_option( argc, argv, "-no" ) == -1 )
+      {
+        if (nabsavg) absavg /= nabsavg;
+      // 
+      //  -The minimum distance absmin between 2 particles during the run of the simulation
+      //  -A Correct simulation will have particles stay at greater than 0.4 (of cutoff) with typical values between .7-.8
+      //  -A simulation where particles don't interact correctly will be less than 0.4 (of cutoff) with typical values between .01-.05
+      //
+      //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
+      //
+      printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
+      if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
+      if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
+      }
+      printf("\n");     
+        
+      //  
+      // Printing summary data
+      //  
+      if( fsum)
+        fprintf(fsum,"%d %d %g\n",n,n_proc,simulation_time);
     }
-
-    simulation_time = read_timer( ) - simulation_time;
-    
-    //printf( "n = %d, simulation time = %g seconds", n, simulation_time);
-    printf( "n = %d,threads = %d, simulation time = %g seconds", n,numthreads, simulation_time);
-
-    if( find_option( argc, argv, "-no" ) == -1 )
-    {
-      if (nabsavg) absavg /= nabsavg;
-    // 
-    //  -The minimum distance absmin between 2 particles during the run of the simulation
-    //  -A Correct simulation will have particles stay at greater than 0.4 (of cutoff) with typical values between .7-.8
-    //  -A simulation where particles don't interact correctly will be less than 0.4 (of cutoff) with typical values between .01-.05
+  
     //
-    //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
+    //  release resources
     //
-
-    printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
-    if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
-    if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
-    }
-    printf("\n");     
-
-    //
-    // Printing summary data
-    //
-    if( fsum) 
-        fprintf(fsum,"%d %g\n",n,simulation_time);
- 
-    //
-    // Clearing space
-    //
-    if( fsum )
-        fclose( fsum );    
+    if ( fsum )
+        fclose( fsum );
+    free( partition_offsets );
+    free( partition_sizes );
+    free( local );
     free( particles );
+    free(particles_acted_upon);
     if( fsave )
         fclose( fsave );
     
+    MPI_Finalize( );
+    
     return 0;
+    
 }
