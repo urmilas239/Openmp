@@ -75,9 +75,11 @@ int main( int argc, char **argv )
 
 
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
+    int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
+    int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
     
     int *partition_sizes= (int*) calloc( n_proc , sizeof(int));
-    int *partition_offsets = (int*) calloc( (n_proc) , sizeof(int) );
+    int *partition_offsets = (int*) calloc( (n_proc+1) , sizeof(int) );
 
 
     MPI_Datatype PARTICLE;
@@ -88,7 +90,7 @@ int main( int argc, char **argv )
 
     
     
-
+    int number_of_interacting_particles = 0;
     set_size( n );
 
     //call the function to set bin variables
@@ -104,14 +106,20 @@ int main( int argc, char **argv )
     //init_particles1(n, particles,bin_map);
     init_particles( n, particles);
     bin_particles( n, particles , bin_map);
-    process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map);
+    process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map, number_of_interacting_particles);
     border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
+    get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+
+
+    //particles on whom apply_force was called in this process
+    particle_t *particles_acted_upon = (particle_t*) malloc( number_of_interacting_particles * sizeof(particle_t) );
+    int particle_index; 
 
 
     std::vector<int> neighbor_list_collect; 
     std::vector<int> particle_list_collect; 
     std::vector<int> particle_list_temp;
-    int number_of_interacting_particles = 0;
+    
 
     
     //
@@ -122,7 +130,7 @@ int main( int argc, char **argv )
     MPI_Bcast(particles, n, PARTICLE, 0, MPI_COMM_WORLD);
     
      int partition_size_per_rank = 0;
-     int npm_size =0;
+     int no_of_particles_in_bin =0;
      int pbm_size = 0;
     //std::cout<<"numthreads:::"<<numthreads<<std::endl;
     for( int step = 0; step < NSTEPS; step++ )
@@ -130,7 +138,7 @@ int main( int argc, char **argv )
         MPI_Barrier(MPI_COMM_WORLD);
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
            
-            
+        particle_index = 0;
         for(int i=0;i<process_bins.size();i++)
         {
             //collect neighbor particle for the current bin.
@@ -147,20 +155,30 @@ int main( int argc, char **argv )
 
             }
 
-            number_of_interacting_particles = particle_list_collect.size();
+            no_of_particles_in_bin = particle_list_collect.size();
 
-            for(int k =0; k<number_of_interacting_particles; k++)
+            for(int k =0; k<no_of_particles_in_bin; k++)
             {
                 particles[particle_list_collect.at(k)].ax = particles[particle_list_collect.at(k)].ay = 0;
-                    for (int l = 0; l < number_of_interacting_particles; l++ )
+                    for (int l = 0; l < no_of_particles_in_bin; l++ )
                     {
                         apply_force( particles[particle_list_collect.at(k)], particles[particle_list_collect.at(l)],&dmin,&davg,&navg);
+                        particles_acted_upon[particle_index] = particles[particle_list_collect.at(k)];
+                        particle_index++;
                     }
             }
 
 
             neighbor_list_collect.clear();
             particle_list_collect.clear();
+
+            for( int i = 0; i < number_of_interacting_particles; i++ )
+            {
+                 move( particles_acted_upon[i] );
+            }
+
+            MPI_Allgatherv( particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+           
         }
 
         if( find_option( argc, argv, "-no" ) == -1 )

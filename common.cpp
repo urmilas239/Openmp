@@ -65,11 +65,13 @@ std::vector<std::vector<int> > initialize_bin_vector()
 
 
 //Divides bins(hence particles) across process
-std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map)
+std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map, int &num_of_particles_in_curr_process)
 {
     std::cout<<"assign_bins_to_current_process_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
+   
+
 
     //int num_bins_per_process =  ceil(bin_count/num_of_processes);
     int num_bins_per_process =  ((bin_count + num_of_processes - 1) / num_of_processes);
@@ -85,6 +87,7 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
         if(current_process_id == current_process)
         {
             process_bins.push_back(bin_idex);
+            num_of_particles_in_curr_process += bin_map.at(bin_idex).size();
         }
         
         assigned_bin_count++;
@@ -100,6 +103,44 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
     return process_bins;
 }
 
+
+
+void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std::vector<int> > bin_map, int** partition_offset, int** partition_sizes)
+{
+
+    std::cout<<"get_num_of_particles_in_each_process START::: "<<std::endl;
+    //total bins
+    int bin_count = bin_map.size();
+
+    //int num_bins_per_process =  ceil(bin_count/num_of_processes);
+    int num_bins_per_process =  ((bin_count + num_of_processes - 1) / num_of_processes);
+    std::vector<int > process_bins(num_of_processes); 
+    int assigned_bin_count = 0;
+    int current_process_id = 0;
+    int num_of_particles_in_curr_process = 0;
+    
+    for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
+    {
+        
+        
+        num_of_particles_in_curr_process += bin_map.at(bin_idex).size();
+        assigned_bin_count++;
+        
+        if(assigned_bin_count > num_bins_per_process)
+        {
+            partition_offset[current_process_id+1] = num_of_particles_in_curr_process - 1;
+            partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+            assigned_bin_count = 0;
+            current_process_id++;
+            process_bins.push_back(num_of_particles_in_curr_process);
+            num_of_particles_in_curr_process = 0;
+        }
+        
+    }
+    std::cout<<"get_num_of_particles_in_each_process END::: "<<std::endl;
+    //return process_bins;
+
+}
 
 
 
