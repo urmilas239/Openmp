@@ -542,7 +542,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     {
         //particle_list.clear();
          bin_index = compute_bin_index_from_xy( p[i].x, p[i].y );
-         std::vector<int> particle_list = bin_map.at(bin_index);
+         std::vector<int> &particle_list = bin_map.at(bin_index);
          particle_list.push_back(i);
          //bin_map.at(bin_index).push_back(i);
          
