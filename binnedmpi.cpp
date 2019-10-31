@@ -42,7 +42,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 5000 );
+    int n = read_int( argc, argv, "-n", 500 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -160,6 +160,7 @@ int main( int argc, char **argv )
 
 
             neighbor_list_collect.clear();
+            particle_list_collect.clear();
         }
 
         if( find_option( argc, argv, "-no" ) == -1 )
