@@ -107,6 +107,11 @@ int main( int argc, char **argv )
     process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map);
     border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
 
+
+    std::vector<int> neighbor_list_collect; 
+    std::vector<int> particle_list_collect; 
+    int number_of_interacting_particles = 0;
+
     
     //
     //  simulate a number of time steps
@@ -125,7 +130,30 @@ int main( int argc, char **argv )
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
            
             
-        //std::cout<<"After rebinning::: "<<omp_get_thread_num()<<std::endl;
+        for(i=0;i<process_bins.size();i++)
+        {
+            //collect neighbor particle for the current bin.
+            neighbor_list_collect = neighbor_bins.at(process_bins.at(i));
+            neighbor_list_collect.push_back(process_bins.at(i))
+            for(int j = 0; j<neighbor_list_collect.size();j++)
+            {
+                particle_list_collect = bin_map.at(neighbor_list_collect.at(i));
+            }
+
+            number_of_interacting_particles = particle_list_collect.size();
+
+            for(int k =0; k<number_of_interacting_particles; k++)
+            {
+                particles[particle_list_collect.at(k)].ax = particles[particle_list_collect.at(k)].ay = 0;
+                    for (int l = 0; l < n; l++ )
+                    {
+                        apply_force( particles[particle_list_collect.at(k)], particles[particle_list_collect.at(l)],&dmin,&davg,&navg);
+                    }
+            }
+
+
+            neighbor_list_collect.clear();
+        }
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
