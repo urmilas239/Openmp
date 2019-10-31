@@ -123,8 +123,6 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
     
     for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
     {
-        
-        
         num_of_particles_in_curr_process += bin_map.at(bin_idex).size();
         assigned_bin_count++;
         
@@ -132,11 +130,11 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
         //if(1)
         {
 
-
-            *partition_offset[current_process_id+1] = *(partition_offset[current_process_id]) + num_of_particles_in_curr_process;
+            *partition_offset[current_process_id+1] = *(partition_offset[current_process_id]) + num_of_particles_in_curr_process + 1;
             *partition_sizes[current_process_id] = num_of_particles_in_curr_process;
-             std::cout<<"current_process_id :: "<<current_process_id<<" ,partition_sizes "<<*partition_sizes[current_process_id]<<", partition_offsets "<<*partition_offset[current_process_id]<<std::endl;
-            assigned_bin_count = 0;
+
+            //printf("current_process_id :: %d ,partition_sizes %d, partition_offsets %d \n",current_process_id, *partition_sizes[current_process_id], *partition_offset[current_process_id]);
+             assigned_bin_count = 0;
             current_process_id++;
             process_bins.push_back(num_of_particles_in_curr_process);
             num_of_particles_in_curr_process = 0;
@@ -144,11 +142,22 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
         }
 
     }
-    /*for(int i = 0; i < num_of_processes; i++)
+
+    //current_process_id++;
+   // printf("num_of_particles_in_curr_process %d num_of_particles_in_curr_process %d \n", num_of_particles_in_curr_process, num_of_particles_in_curr_process);
+
+    process_bins.push_back(num_of_particles_in_curr_process);
+    *partition_offset[current_process_id+1] = *(partition_offset[current_process_id]) + num_of_particles_in_curr_process + 1;
+    *partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+
+    //printf("\n current_process_id :: %d ,partition_sizes %d, partition_offsets %d \n",current_process_id, *partition_sizes[current_process_id], *partition_offset[current_process_id]);
+     assigned_bin_count = 0;
+
+    for(int i = 0; i < num_of_processes; i++)
     {
         std::cout<<"i :: "<<i<<" ,partition_sizes "<<*partition_sizes[i]<<", partition_offsets "<<*partition_offset[i]<<std::endl;
     }
-    std::cout<<"partition_offsets "<<partition_offset[num_of_processes]<<std::endl;*/
+    std::cout<<"partition_offsets last   "<<*(partition_offset[num_of_processes])<<std::endl;
     std::cout<<"get_num_of_particles_in_each_process END::: "<<std::endl;
     //return process_bins;
 
