@@ -67,7 +67,7 @@ std::vector<std::vector<int> > initialize_bin_vector()
 //Divides bins(hence particles) across process
 std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map, int &num_of_particles_in_curr_process)
 {
-    std::cout<<"assign_bins_to_current_process_mpi START::: "<<std::endl;
+    //std::cout<<"assign_bins_to_current_process_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
    
@@ -99,7 +99,7 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
         }
         
     }
-    std::cout<<"assign_bins_to_current_process_mpi END::: "<<std::endl;
+    //std::cout<<"assign_bins_to_current_process_mpi END::: "<<std::endl;
     return process_bins;
 }
 
@@ -108,7 +108,7 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
 void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std::vector<int> > bin_map, int** partition_offset, int** partition_sizes)
 {
 
-    std::cout<<"get_num_of_particles_in_each_process START::: "<<std::endl;
+    //std::cout<<"get_num_of_particles_in_each_process START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
 
@@ -158,7 +158,7 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
         std::cout<<"i :: "<<i<<" ,partition_sizes "<<*partition_sizes[i]<<", partition_offsets "<<*partition_offset[i]<<std::endl;
     }
     std::cout<<"partition_offsets last   "<<*(partition_offset[num_of_processes])<<std::endl;
-    std::cout<<"get_num_of_particles_in_each_process END::: "<<std::endl;
+    //std::cout<<"get_num_of_particles_in_each_process END::: "<<std::endl;
     //return process_bins;
 
 }
@@ -168,7 +168,7 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
 //Divides bins(hence particles) across process
 std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map)
 {
-    std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
+   // std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
 
@@ -192,7 +192,7 @@ std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes
         }
         
     }
-    std::cout<<"assign_bins_to_processes_mpi END::: "<<std::endl;
+    //std::cout<<"assign_bins_to_processes_mpi END::: "<<std::endl;
     return process_bins;
 }
 
@@ -207,7 +207,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
     particle_t *particles, 
     int &partition_size_per_rank)
 {
-    std::cout<<"form_particles_array_for_MPI START::: "<<std::endl;
+    //std::cout<<"form_particles_array_for_MPI START::: "<<std::endl;
     //std::vector<int>  bin_ids = process_bins.at(process_id);
     int num_of_bins_in_curr_proc = bin_ids.size();
     int particles_per_bin;
@@ -293,7 +293,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
             }
     }
 
-    std::cout<<"form_particles_array_for_MPI END::: "<<std::endl;
+    //std::cout<<"form_particles_array_for_MPI END::: "<<std::endl;
 
 }
 
@@ -335,13 +335,13 @@ std::vector<int> get_boundary_bins_for_curr_process(std::vector<int > process_bi
 
 std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > process_bins, std::vector<std::vector<int> > neighbor_bins)
 {
-    std::cout<<"get_boundary_bins START::: "<<std::endl;
+    //std::cout<<"get_boundary_bins START::: "<<std::endl;
     int num_of_processes = process_bins.size();
     std::vector<int>  bin_ids;
     std::vector<int>  neghbors_list;
     std::vector<std::vector<int> > border_neighbors(num_of_processes, std::vector<int>()); 
   
-  std::cout<<"neighbor_bins size ::: "<< neighbor_bins.size()<<std::endl;
+  //std::cout<<"neighbor_bins size ::: "<< neighbor_bins.size()<<std::endl;
   for(int i = 0; i < num_of_processes; i++)
   {
     bin_ids = process_bins.at(i);
@@ -378,7 +378,7 @@ std::vector<std::vector<int> > get_boundary_bins(std::vector<std::vector<int> > 
  
    
     
-std::cout<<"get_boundary_bins END::: "<<std::endl;
+//std::cout<<"get_boundary_bins END::: "<<std::endl;
 return border_neighbors;
 
 }
@@ -492,19 +492,19 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
  void set_bin_count(int n)
  {
 
-    std::cout<< "n::" <<n<<std::endl;
-    std::cout<< "size::" <<size<<std::endl;
+    //std::cout<< "n::" <<n<<std::endl;
+    //std::cout<< "size::" <<size<<std::endl;
 
     bin_size = cutoff*10;
-    std::cout<< "bin_size::" <<bin_size<<std::endl;
+    //std::cout<< "bin_size::" <<bin_size<<std::endl;
     num_of_bins_x = ceil(size/bin_size);
-    std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;
+    //std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;
     num_of_bins_y = num_of_bins_x;
-    std::cout<< "num_of_bins_y::" <<num_of_bins_y<<std::endl;
+    //std::cout<< "num_of_bins_y::" <<num_of_bins_y<<std::endl;
     total_bin_count = num_of_bins_x*num_of_bins_y;
-    std::cout<< "total_bin_count::" <<total_bin_count<<std::endl;
+    //std::cout<< "total_bin_count::" <<total_bin_count<<std::endl;
     bin_density = n/total_bin_count;
-    std::cout<< "bin_density::" <<bin_density<<std::endl;
+   // std::cout<< "bin_density::" <<bin_density<<std::endl;
     
  }
 

@@ -42,7 +42,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 5000 );
+    int n = read_int( argc, argv, "-n", 500 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -109,7 +109,48 @@ int main( int argc, char **argv )
     bin_particles( n, particles , bin_map);
     process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map, number_of_interacting_particles);
     border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
-    get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+   // get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+
+    if(1)
+    {
+
+        int bin_count = bin_map.size();
+
+        //int num_bins_per_process =  ceil(bin_count/num_of_processes);
+        int num_bins_per_process =  ((bin_count + n_proc - 1) / n_proc);
+        std::vector<int > process_bins(n_proc);
+        int assigned_bin_count = 0;
+        int current_process_id = 0;
+        int num_of_particles_in_curr_process = 0;
+        for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
+        {
+            num_of_particles_in_curr_process += bin_map.at(bin_idex).size();
+            assigned_bin_count++;
+
+            if(assigned_bin_count > num_bins_per_process)
+            //if(1)
+            {
+
+                partition_offsets[current_process_id+1] = (partition_offsets[current_process_id]) + num_of_particles_in_curr_process + 1;
+                partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+
+                //printf("current_process_id :: %d ,partition_sizes %d, partition_offsets %d \n",current_process_id, *partition_sizes[current_process_id], *partition_offset[current_process_id]);
+                 assigned_bin_count = 0;
+                current_process_id++;
+                process_bins.push_back(num_of_particles_in_curr_process);
+                num_of_particles_in_curr_process = 0;
+
+            }
+
+        }
+
+        //current_process_id++;
+       // printf("num_of_particles_in_curr_process %d num_of_particles_in_curr_process %d \n", num_of_particles_in_curr_process, num_of_particles_in_curr_process);
+
+        process_bins.push_back(num_of_particles_in_curr_process);
+        partition_offsets[current_process_id+1] = partition_offsets[current_process_id] + num_of_particles_in_curr_process + 1;
+        partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+    }
 
 
     //particles on whom apply_force was called in this process
@@ -149,7 +190,49 @@ int main( int argc, char **argv )
             particles_acted_upon =(particle_t*) realloc( particles_acted_upon, number_of_interacting_particles * sizeof(particle_t) );
 
             border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
-            get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+           // get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
+            if(1)
+            {
+
+                int bin_count = bin_map.size();
+
+                //int num_bins_per_process =  ceil(bin_count/num_of_processes);
+                int num_bins_per_process =  ((bin_count + n_proc - 1) / n_proc);
+                std::vector<int > process_bins(n_proc);
+                int assigned_bin_count = 0;
+                int current_process_id = 0;
+                int num_of_particles_in_curr_process = 0;
+                for(int bin_idex =0; bin_idex < bin_count; bin_idex++)
+                {
+                    num_of_particles_in_curr_process += bin_map.at(bin_idex).size();
+                    assigned_bin_count++;
+
+                    if(assigned_bin_count > num_bins_per_process)
+                    //if(1)
+                    {
+
+                        partition_offsets[current_process_id+1] = (partition_offsets[current_process_id]) + num_of_particles_in_curr_process + 1;
+                        partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+
+                        //printf("current_process_id :: %d ,partition_sizes %d, partition_offsets %d \n",current_process_id, *partition_sizes[current_process_id], *partition_offset[current_process_id]);
+                         assigned_bin_count = 0;
+                        current_process_id++;
+                        process_bins.push_back(num_of_particles_in_curr_process);
+                        num_of_particles_in_curr_process = 0;
+
+                    }
+
+                }
+
+                //current_process_id++;
+               // printf("num_of_particles_in_curr_process %d num_of_particles_in_curr_process %d \n", num_of_particles_in_curr_process, num_of_particles_in_curr_process);
+
+                process_bins.push_back(num_of_particles_in_curr_process);
+                partition_offsets[current_process_id+1] = partition_offsets[current_process_id] + num_of_particles_in_curr_process + 1;
+                partition_sizes[current_process_id] = num_of_particles_in_curr_process;
+            }
+
+
         }
            
         particle_index = 0;
@@ -222,10 +305,10 @@ int main( int argc, char **argv )
            // bin_map.clear();
             rebin = true;
 
-            for(int i = 0; i < n_proc; i++)
+           /* for(int i = 0; i < n_proc; i++)
             {
                std::cout<<"i------ :: "<<i<<" ,partition_sizes "<<partition_sizes[i]<<", partition_offsets "<<partition_offsets[i]<<std::endl;
-            }
+            }*/
             partition_offsets[n_proc] = min(partition_offsets[n_proc], n);
             std::cout<<"partition_offsets  last ------"<<partition_offsets[n_proc]<<std::endl;
             MPI_Allgatherv(particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
