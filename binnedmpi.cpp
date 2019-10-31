@@ -42,7 +42,7 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 500 );
+    int n = read_int( argc, argv, "-n", 50 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -75,8 +75,8 @@ int main( int argc, char **argv )
 
 
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
-    int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
-    int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
+    //int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
+    //int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
     
     int *partition_sizes= (int*) calloc( n_proc , sizeof(int));
     int *partition_offsets = (int*) calloc( (n_proc+1) , sizeof(int) );
@@ -200,7 +200,7 @@ int main( int argc, char **argv )
             }
 
             MPI_Allgatherv( particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
-           
+           }
         }
 
        simulation_time = read_timer( ) - simulation_time;
@@ -238,7 +238,6 @@ int main( int argc, char **argv )
         fclose( fsum );
     free( partition_offsets );
     free( partition_sizes );
-    free( local );
     free( particles );
     free(particles_acted_upon);
     if( fsave )
