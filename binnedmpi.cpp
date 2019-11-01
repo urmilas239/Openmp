@@ -111,7 +111,7 @@ int main( int argc, char **argv )
     border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
    // get_num_of_particles_in_each_process(n_proc, bin_map, &partition_offsets, &partition_sizes);
 
-    if(1)
+    if(0)
     {
 
         int bin_count = bin_map.size();
@@ -300,8 +300,114 @@ int main( int argc, char **argv )
 
             for( int i = 0; i < number_of_interacting_particles; i++ )
             {
-                 move( particles_acted_upon[i] );
+                // move( particles_acted_upon[i] );
+
+                if(1)
+                {
+                          int old_bin_index = compute_bin_index_from_xy( particles_acted_upon[i].x, particles_acted_upon[i].y);
+            
+
+                            particles_acted_upon[i].vx += particles_acted_upon[i].ax * dt;
+                            particles_acted_upon[i].vy += particles_acted_upon[i].ay * dt;
+                            particles_acted_upon[i].x  += particles_acted_upon[i].vx * dt;
+                            particles_acted_upon[i].y  += particles_acted_upon[i].vy * dt;
+
+                            //
+                            //  bounce from walls
+                            //
+                            while( particles_acted_upon[i].x < 0 || particles_acted_upon[i].x > size )
+                            {
+                                particles_acted_upon[i].x  = particles_acted_upon[i].x < 0 ? -particles_acted_upon[i].x : 2*size-particles_acted_upon[i].x;
+                                particles_acted_upon[i].vx = -particles_acted_upon[i].vx;
+                            }
+                            while( particles_acted_upon[i].y < 0 || particles_acted_upon[i].y > size )
+                            {
+                                particles_acted_upon[i].y  = particles_acted_upon[i].y < 0 ? -particles_acted_upon[i].y : 2*size-particles_acted_upon[i].y;
+                                particles_acted_upon[i].vy = -particles_acted_upon[i].vy;
+                            }
+
+                            //std::cout<< "Move::After:::::: p.x :: " << p.x << ",:: p.y :: " << p.y << std::endl;
+                            int new_bin_index = compute_bin_index_from_xy( p.x, p.y);
+
+
+                            if(old_bin_index != new_bin_index)
+                            {
+                                //1. Remove from my bin
+                                remove_particle_from_bin(int old_bin_index, int new_bin_index int particle_index, std::vector<std::vector<int> > &bin_map );
+
+                                //2.particle has moved. Identify processes that needs update.
+                                //Tell new process to which the new bin id belongs to and its neoghbors
+                                //Tell to my neighbors
+                                 bin_process_map[new_bin_index]
+                                 std::vector<int> my_neighbors = neighbor_bins.at(old_bin_index);
+                                 int processes_to_update[9]= {-1,-1,-1,-1,-1,-1,-1,-1};
+                                 //check if old_bin_index's neigbors are in me
+                                 int index =0;
+                                 for(int m = 0; m < my_neighbors.size(); m ++)
+                                 {
+                                    if(bin_process_map[my_neighbors.at(m)] == rank)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        processes_to_update[index] = bin_process_map[my_neighbors.at(m)];
+                                        index++;
+                                    }
+                                 }
+
+                                 if(bin_process_map[new_bin_index] != rank)
+                                 {
+                                    processes_to_update[index] = bin_process_map[new_bin_index];
+                                 }
+                                
+                            }
+                            MPI_request *request;
+                            //Send info to all affected processes
+                            for(int ii = 0; ii<=index; ii++)
+                            {
+                                
+                                MPI_Isend(particles_acted_upon[i], 1, PARTICLE, processes_to_update[ii], rank, MPI_COMM_WORLD, &request);
+                            }
+                }
+
             }
+
+
+            //TODO: Send a flag to processes to say "I am done sending"
+            Particle_t p_tem;
+            p_tem.index = -1;
+            MPI_Isend(&p_tem, 1, PARTICLE, processes_to_update[ii], rank, MPI_COMM_WORLD, &request);
+
+
+
+            //Handle receive
+            bool stop_receving = false;
+            int stop_counter = 0;
+            particle_t new_particle;
+
+            while(!stop_receving)
+            {
+                MPI_Recv(&new_particle, 1, PARTICLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
+                if(new_particle.index == -1)
+                {
+                    stop_receving += new_particle.index;
+                }
+                else
+                {
+                    int current_bin_index  = compute_bin_index_from_xy( particles[new_particle.index].x, particles[new_particle.index].y ); 
+                    int new_bin_index = compute_bin_index_from_xy( new_particle.x, new_particle.y ); 
+                    remove_particle_from_bin(current_bin_index, new_bin_index, new_particle.index, std::vector<std::vector<int> > &bin_map );
+                    particles[new_particle.index] = new_particle;
+
+                }
+                if(stop_counter == -1*(n_proc-1))
+                {
+                    stop_receving = true;
+                }
+            }
+
+
            // bin_map.clear();
             rebin = true;
 
