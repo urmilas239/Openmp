@@ -424,7 +424,8 @@ if(rank == 1)
                        size = particles_updates_after_move.size();
                     }
                     printf("From %d -> to %d, Value sent::: %d\n", rank, i, size);
-                    MPI_Isend(&size, 1, MPI_INT, i, rank*10, MPI_COMM_WORLD, &request);
+                   // MPI_Isend(&size, 1, MPI_INT, i, rank*10, MPI_COMM_WORLD, &request);
+                     MPI_Send(&size, 1, MPI_INT, i, rank*10, MPI_COMM_WORLD);
                     send_count++;
                 }
 
@@ -435,18 +436,26 @@ if(rank == 1)
             send_count = 0;
             //Receive sizes and wait to receive size from particles that only send size != -1
             int *receive_size = (int*)malloc(n_proc*sizeof (int));
+            int temp_receive = 0;
             for(int i =0; i<n_proc; i++)
             {
                 if(i != rank)
                 {
-                    MPI_Irecv(&receive_size[i], 1, MPI_INT, i, i*10, MPI_COMM_WORLD, &request);
+                   // MPI_Irecv(&receive_size[i], 1, MPI_INT, i, i*10, MPI_COMM_WORLD, &request);
+                     MPI_Recv(&temp_receive, 1, MPI_INT, i, i*10, MPI_COMM_WORLD, &status);
                    // printf("in %d recieve_d value:: %d\n", rank,receive_size[i]);
-                    printf("From %d -> to %d, Value Received::: %d\n\n\n", i, rank, receive_size[i]);
+                    printf("From %d -> to %d, Value Received::: %d\n\n\n", i, rank,temp_receive);
+                    if(temp_receive > 0)
+                    {
+                        receive_size[i] = temp_receive;
+                    }
                     send_count++;
                 }
 
             }
-            //printf("recieve_count:: %d\n", send_count);
+
+
+            printf("recieve_count:: %d\n", send_count);
             //Send updated particles only to relevant processes
 
             //Sending sizes End
@@ -480,7 +489,8 @@ if(rank == 1)
                     if(particles_updates_after_move.at(i).empty() && particles_updates_after_move.size()>0)
                     {
                        size = particles_updates_after_move.size();
-                        MPI_Isend(&particles_updates_after_move, particles_updates_after_move.size(), PARTICLE, i, rank*100, MPI_COMM_WORLD, &request);
+                        //MPI_Isend(&particles_updates_after_move, particles_updates_after_move.size(), PARTICLE, i, rank*100, MPI_COMM_WORLD, &request);
+                       MPI_Send(&particles_updates_after_move, particles_updates_after_move.size(), PARTICLE, i, rank*100, MPI_COMM_WORLD);
                     }
                 }
 
@@ -495,7 +505,8 @@ if(rank == 1)
 
                     particle_t receive_particles[receive_size[i]];
                     particle_t new_particle;
-                    MPI_Irecv(&receive_particles, receive_size[i], PARTICLE, i, i*100, MPI_COMM_WORLD, &request);
+                    //MPI_Irecv(&receive_particles, receive_size[i], PARTICLE, i, i*100, MPI_COMM_WORLD, &request);
+                    MPI_Recv(&receive_particles, receive_size[i], PARTICLE, i, i*100, MPI_COMM_WORLD, &status);
                     for(int v=0;v<receive_size[i];i++)
                     {
                         new_particle = receive_particles[i];
@@ -508,7 +519,7 @@ if(rank == 1)
 
             }
 
-
+         printf("-----After Sending particles-----------------\n");
 
 
 
