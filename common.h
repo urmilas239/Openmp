@@ -90,7 +90,7 @@ std::vector<int> assign_bins_to_current_process_mpi(int num_of_processes, int cu
 std::vector<int> get_boundary_bins_for_curr_process(std::vector<int > process_bins, std::vector<std::vector<int> > neighbor_bins);
 void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std::vector<int> > bin_map, int** partition_offset, int** partition_sizes);
 void remove_particle_from_bin(int old_bin_index, int new_bin_index, int particle_index, std::vector<std::vector<int> > &bin_map );
-void get_neighbors_in_other_process(int bin_index, int current_rank, std::vector<std::vector<int> > neighbor_bins , std::vector<int> bin_process_map, std::set<int> &outside_neighbors);
+void get_neighbors_in_other_process(int bin_index, int current_rank, std::vector<std::vector<int> > neighbor_bins , std::vector<int> bin_process_map, std::vector<int> &outside_neighbors);
 std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map, int &num_of_particles_in_curr_process);
 
 

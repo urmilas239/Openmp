@@ -7,7 +7,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <vector>
-#include<set>
+#include <set>
 #include <iostream>
 #include <algorithm> 
 #include "common.h"
@@ -100,6 +100,12 @@ std::vector<int > assign_bins_to_current_process_mpi(int num_of_processes, int c
         }
         
     }
+
+    /*for(int i =0; i<bin_process_map.size();i++)
+    {
+        printf(" bin idex :: %d, process %d \n", i, bin_process_map[i]);
+    }*/
+    // process_bins.push_back(num_of_particles_in_curr_process);
     //std::cout<<"assign_bins_to_current_process_mpi END::: "<<std::endl;
     return process_bins;
 }
@@ -154,11 +160,11 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
     //printf("\n current_process_id :: %d ,partition_sizes %d, partition_offsets %d \n",current_process_id, *partition_sizes[current_process_id], *partition_offset[current_process_id]);
      assigned_bin_count = 0;
 
-    for(int i = 0; i < num_of_processes; i++)
+    /*for(int i = 0; i < num_of_processes; i++)
     {
         std::cout<<"i :: "<<i<<" ,partition_sizes "<<*partition_sizes[i]<<", partition_offsets "<<*partition_offset[i]<<std::endl;
-    }
-    std::cout<<"partition_offsets last   "<<*(partition_offset[num_of_processes])<<std::endl;
+    }*/
+    //std::cout<<"partition_offsets last   "<<*(partition_offset[num_of_processes])<<std::endl;
     //std::cout<<"get_num_of_particles_in_each_process END::: "<<std::endl;
     //return process_bins;
 
@@ -386,14 +392,18 @@ return border_neighbors;
 
 
 
-void get_neighbors_in_other_process(int bin_index, int current_rank, std::vector<std::vector<int> > neighbor_bins , std::vector<int> bin_process_map, std::set<int> &outside_neighbors)
+void get_neighbors_in_other_process(int bin_index, int current_rank, std::vector<std::vector<int> > neighbor_bins , std::vector<int> bin_process_map, std::vector<int> &outside_neighbors)
 {
     std::vector<int> neighbors = neighbor_bins.at(bin_index);
     for(int i =0; i< neighbors.size(); i++)
     {
         if(bin_process_map[neighbors.at(i)] != current_rank)
         {
-            outside_neighbors.insert(neighbors.at(i));
+            if(std::find(outside_neighbors.begin(), outside_neighbors.end(), neighbors.at(i)) == outside_neighbors.end())
+            {
+                outside_neighbors.push_back(neighbors.at(i));
+            }
+
         }
     }
 
