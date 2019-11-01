@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <math.h>
 #include <vector>
+#include<set>
 #include <map>
 #include <iostream>
 #include "common.h"
@@ -26,6 +27,7 @@ int main( int argc, char **argv )
     std::vector<int> process_bins; 
     std::vector<int> bin_process_map;
     std::vector<int> border_neighbors;
+
 
     MPI_Status status; 
 
@@ -67,6 +69,16 @@ int main( int argc, char **argv )
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
 
+
+
+
+    //Variables used for sending particle updates after move.
+    std::vector<std::vector<particle_t>> particles_updates_after_move(n_proc, std::vector<particle_t>());
+
+    //int* processes_to_update =  (int*) calloc( (n_proc-1) , sizeof(int) );
+
+    //Maintains # of particles that will be sent to each rank ID(index of the vector)
+    std::vector<int> particles_counts_updates_after_move(n_proc);
 
 
      int num_of_particles_in_proc;
@@ -162,7 +174,26 @@ int main( int argc, char **argv )
     std::vector<int> particle_list_collect; 
     std::vector<int> particle_list_temp;
 
-    
+
+MPI_Request *request1;
+MPI_Request *request2;
+
+if(rank == 0)
+{
+    int chsh[1]={999};
+    MPI_Isend(chsh, 1, MPI_INT, 1, 6, MPI_COMM_WORLD, request1);
+}
+
+
+if(rank == 1)
+{ int chh[1];
+    MPI_Irecv(&chh, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, request2);
+    printf("In %d , received test:: %d", rank, chh);
+}
+
+
+
+
 
     
     //
@@ -176,12 +207,12 @@ int main( int argc, char **argv )
      int no_of_particles_in_bin =0;
      int prev_k_index = 0;
      int current_k_index = 0;
-    //std::cout<<"numthreads:::"<<numthreads<<std::endl;
+    std::cout<<"numthreads:::"<<n_proc<<std::endl;
     for( int step = 0; step < NSTEPS; step++ )
     {
-        MPI_Barrier(MPI_COMM_WORLD);
+        //MPI_Barrier(MPI_COMM_WORLD);
          //printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
-
+        rebin = false;
         if(rebin)
         {
             bin_map = initialize_bin_vector();
@@ -280,9 +311,9 @@ int main( int argc, char **argv )
             if( find_option( argc, argv, "-no" ) == -1 )
             {
               
-              MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-              MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
-              MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
+             // MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+             //MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+              //MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
 
      
               if (rank == 0){
@@ -300,84 +331,134 @@ int main( int argc, char **argv )
 
             for( int i = 0; i < number_of_interacting_particles; i++ )
             {
-                // move( particles_acted_upon[i] );
+                int old_bin_index = compute_bin_index_from_xy( particles_acted_upon[i].x, particles_acted_upon[i].y);
+                move( particles_acted_upon[i] );
+                int new_bin_index = compute_bin_index_from_xy( particles_acted_upon[i].x, particles_acted_upon[i].y);
+
 
                 if(1)
                 {
-                          int old_bin_index = compute_bin_index_from_xy( particles_acted_upon[i].x, particles_acted_upon[i].y);
-            
+                    int index1;
+                    if(old_bin_index != new_bin_index)
+                    {
+                        //1. Remove from my bin
+                        remove_particle_from_bin( old_bin_index,  new_bin_index,  particles_acted_upon[i].index, bin_map );
 
-                            particles_acted_upon[i].vx += particles_acted_upon[i].ax * dt;
-                            particles_acted_upon[i].vy += particles_acted_upon[i].ay * dt;
-                            particles_acted_upon[i].x  += particles_acted_upon[i].vx * dt;
-                            particles_acted_upon[i].y  += particles_acted_upon[i].vy * dt;
-
-                            //
-                            //  bounce from walls
-                            //
-                            while( particles_acted_upon[i].x < 0 || particles_acted_upon[i].x > size )
-                            {
-                                particles_acted_upon[i].x  = particles_acted_upon[i].x < 0 ? -particles_acted_upon[i].x : 2*size-particles_acted_upon[i].x;
-                                particles_acted_upon[i].vx = -particles_acted_upon[i].vx;
-                            }
-                            while( particles_acted_upon[i].y < 0 || particles_acted_upon[i].y > size )
-                            {
-                                particles_acted_upon[i].y  = particles_acted_upon[i].y < 0 ? -particles_acted_upon[i].y : 2*size-particles_acted_upon[i].y;
-                                particles_acted_upon[i].vy = -particles_acted_upon[i].vy;
-                            }
-
-                            //std::cout<< "Move::After:::::: p.x :: " << p.x << ",:: p.y :: " << p.y << std::endl;
-                            int new_bin_index = compute_bin_index_from_xy( p.x, p.y);
+                        //2.particle has moved. Identify processes that needs update.
+                        std::set<int> processes_to_contact;
+                        get_neighbors_in_other_process(old_bin_index, rank, neighbor_bins , bin_process_map, processes_to_contact);
 
 
-                            if(old_bin_index != new_bin_index)
-                            {
-                                //1. Remove from my bin
-                                remove_particle_from_bin(int old_bin_index, int new_bin_index int particle_index, std::vector<std::vector<int> > &bin_map );
 
-                                //2.particle has moved. Identify processes that needs update.
-                                //Tell new process to which the new bin id belongs to and its neoghbors
-                                //Tell to my neighbors
-                                 bin_process_map[new_bin_index]
-                                 std::vector<int> my_neighbors = neighbor_bins.at(old_bin_index);
-                                 int processes_to_update[9]= {-1,-1,-1,-1,-1,-1,-1,-1};
-                                 //check if old_bin_index's neigbors are in me
-                                 int index =0;
-                                 for(int m = 0; m < my_neighbors.size(); m ++)
-                                 {
-                                    if(bin_process_map[my_neighbors.at(m)] == rank)
-                                    {
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        processes_to_update[index] = bin_process_map[my_neighbors.at(m)];
-                                        index++;
-                                    }
-                                 }
+                        if(bin_process_map[new_bin_index] != rank)
+                        {
+                            processes_to_contact.insert(bin_process_map[new_bin_index]);
+                        }
 
-                                 if(bin_process_map[new_bin_index] != rank)
-                                 {
-                                    processes_to_update[index] = bin_process_map[new_bin_index];
-                                 }
-                                
-                            }
-                            MPI_request *request;
-                            //Send info to all affected processes
-                            for(int ii = 0; ii<=index; ii++)
-                            {
-                                
-                                MPI_Isend(particles_acted_upon[i], 1, PARTICLE, processes_to_update[ii], rank, MPI_COMM_WORLD, &request);
-                            }
+                        get_neighbors_in_other_process(new_bin_index, bin_process_map[new_bin_index], neighbor_bins , bin_process_map, processes_to_contact);
+
+
+
+                        std::set<int>::iterator it = processes_to_contact.begin();
+
+                        while (it != processes_to_contact.end())
+                        {
+
+                             particles_updates_after_move.at(*it).push_back(particles_acted_upon[i] );
+                             it++;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            /*
+            int size;
+            int send_count;
+             MPI_Request *request;
+             printf("In %d, before sending request.....", rank);
+            for(int i =0; i<n_proc; i++)
+            {
+
+
+               if(i != rank)
+                {
+                     size = 0;
+                    if(particles_updates_after_move.at(i).empty() && particles_updates_after_move.size()>0)
+                    {
+                       size = particles_updates_after_move.size();
+                    }
+                    printf("In %d, before sending request %d", rank, send_count);
+                    MPI_Isend(&size, 1, MPI_INT, i, rank*10, MPI_COMM_WORLD, request);
+                    send_count++;
+                }
+
+
+            }
+            printf("send_count:: %d", send_count);
+
+            send_count = 0;
+            //Receive sizes and wait to receive size from particles that only send size != -1
+            int receive_size[n_proc];
+            for(int i =0; i<n_proc; i++)
+            {
+                if(i != rank)
+                {
+                    MPI_Irecv(&receive_size[i], 1, MPI_INT, i, i*10, MPI_COMM_WORLD, request);
+                    send_count++;
+                }
+
+            }
+            printf("recieve_count:: %d", send_count);
+            //Send updated particles only to relevant processes
+
+            for(int i =0; i<n_proc; i++)
+            {
+                if(i != rank)
+                {
+                    if(particles_updates_after_move.at(i).empty() && particles_updates_after_move.size()>0)
+                    {
+                       size = particles_updates_after_move.size();
+                        MPI_Isend(&particles_updates_after_move, particles_updates_after_move.size(), PARTICLE, i, rank*100, MPI_COMM_WORLD, request);
+                    }
                 }
 
             }
 
 
+            for(int i =0; i<n_proc; i++)
+            {
+
+                if(i != rank && receive_size[i] > 0)
+                {
+
+                    particle_t receive_particles[receive_size[i]];
+                    particle_t new_particle;
+                    MPI_Irecv(&receive_particles, receive_size[i], PARTICLE, i, i*100, MPI_COMM_WORLD, request);
+                    for(int v=0;v<receive_size[i];i++)
+                    {
+                        new_particle = receive_particles[i];
+                        int current_bin_index  = compute_bin_index_from_xy( particles[(int)new_particle.index].x, particles[(int)new_particle.index].y );
+                        int new_bin_index = compute_bin_index_from_xy( new_particle.x, new_particle.y );
+                        remove_particle_from_bin(current_bin_index, new_bin_index, new_particle.index, bin_map );
+                        particles[(int)new_particle.index] = new_particle;
+                    }
+                }
+
+            }
+
+            */
+
+
+
+
+/*
             //TODO: Send a flag to processes to say "I am done sending"
-            Particle_t p_tem;
+            particle_t p_tem;
             p_tem.index = -1;
-            MPI_Isend(&p_tem, 1, PARTICLE, processes_to_update[ii], rank, MPI_COMM_WORLD, &request);
+            MPI_Isend(&p_tem, 1, PARTICLE, processes_to_update[ii], rank, MPI_COMM_WORLD, request);
 
 
 
@@ -388,36 +469,36 @@ int main( int argc, char **argv )
 
             while(!stop_receving)
             {
-                MPI_Recv(&new_particle, 1, PARTICLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
+                MPI_Recv(&new_particle, 1, PARTICLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, request);
                 if(new_particle.index == -1)
                 {
                     stop_receving += new_particle.index;
                 }
                 else
                 {
-                    int current_bin_index  = compute_bin_index_from_xy( particles[new_particle.index].x, particles[new_particle.index].y ); 
+                    int current_bin_index  = compute_bin_index_from_xy( particles[(int)new_particle.index].x, particles[(int)new_particle.index].y );
                     int new_bin_index = compute_bin_index_from_xy( new_particle.x, new_particle.y ); 
-                    remove_particle_from_bin(current_bin_index, new_bin_index, new_particle.index, std::vector<std::vector<int> > &bin_map );
-                    particles[new_particle.index] = new_particle;
+                    remove_particle_from_bin(current_bin_index, new_bin_index, new_particle.index, bin_map );
+                    particles[(int)new_particle.index] = new_particle;
 
                 }
                 if(stop_counter == -1*(n_proc-1))
                 {
                     stop_receving = true;
                 }
-            }
+            }*/
 
 
            // bin_map.clear();
-            rebin = true;
+            rebin = false;
 
            /* for(int i = 0; i < n_proc; i++)
             {
                std::cout<<"i------ :: "<<i<<" ,partition_sizes "<<partition_sizes[i]<<", partition_offsets "<<partition_offsets[i]<<std::endl;
             }*/
-            partition_offsets[n_proc] = min(partition_offsets[n_proc], n);
-            std::cout<<"partition_offsets  last ------"<<partition_offsets[n_proc]<<std::endl;
-            MPI_Allgatherv(particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+           // partition_offsets[n_proc] = min(partition_offsets[n_proc], n);
+            //std::cout<<"partition_offsets  last ------"<<partition_offsets[n_proc]<<std::endl;
+            //MPI_Allgatherv(particles_acted_upon, number_of_interacting_particles, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
            }
      }
 

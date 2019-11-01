@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <vector>
+#include<set>
 #include <iostream>
 #include <algorithm> 
 #include "common.h"
@@ -384,6 +385,23 @@ return border_neighbors;
 }
 
 
+
+void get_neighbors_in_other_process(int bin_index, int current_rank, std::vector<std::vector<int> > neighbor_bins , std::vector<int> bin_process_map, std::set<int> &outside_neighbors)
+{
+    std::vector<int> neighbors = neighbor_bins.at(bin_index);
+    for(int i =0; i< neighbors.size(); i++)
+    {
+        if(bin_process_map[neighbors.at(i)] != current_rank)
+        {
+            outside_neighbors.insert(neighbors.at(i));
+        }
+    }
+
+}
+
+
+
+
 std::vector<std::vector<int> > initialize_neighbor_bins()
 {
      //std::cout << ":::IN neighbor_bins::: " << std::endl;
@@ -518,7 +536,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
  }
 
 
- void remove_particle_from_bin(int old_bin_index, int new_bin_index int particle_index, std::vector<std::vector<int> > &bin_map )
+ void remove_particle_from_bin(int old_bin_index, int new_bin_index, int particle_index, std::vector<std::vector<int> > &bin_map )
  {
      std::vector<int> particle_list = bin_map.at(old_bin_index);
      int number_of_particles = particle_list.size();
@@ -535,7 +553,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
      bin_map.erase(bin_map.begin() + old_bin_index);
      bin_map.insert(bin_map.begin()+old_bin_index, particle_list);
-     bin_map.at(new_bin_index).push_back(p.index);
+     bin_map.at(new_bin_index).push_back(particle_index);
 
  }
 
