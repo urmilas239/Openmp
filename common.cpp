@@ -629,7 +629,7 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
 
  void remove_particle_from_bin(int old_bin_index, int new_bin_index, int particle_index, std::vector<std::vector<int> > &bin_map )
  {
-     std::vector<int> particle_list = bin_map.at(old_bin_index);
+     std::vector<int> &particle_list = bin_map.at(old_bin_index);
      int number_of_particles = particle_list.size();
      for(int i = 0; i< number_of_particles; i++)
      {
