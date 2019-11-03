@@ -159,6 +159,8 @@ int main( int argc, char **argv )
      int current_k_index = 0;
 
      int *receive_size = (int*)malloc(n_proc*sizeof (int));
+     //particle_t *receive_particles = (particle_t*)malloc(number_of_interacting_particles*10*sizeof(particle_t));
+      particle_t receive_particles[number_of_interacting_particles] ;
 
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -413,7 +415,7 @@ int main( int argc, char **argv )
                 if(i != rank && receive_size[i] > 0)
                 {
 
-                    particle_t receive_particles[receive_size[i]];
+
                     particle_t new_particle;
                     //MPI_Irecv(&receive_particles, receive_size[i], PARTICLE, i, i*100, MPI_COMM_WORLD, &request);
                     MPI_Recv(&receive_particles, receive_size[i], PARTICLE, i, i*100, MPI_COMM_WORLD, &status);
