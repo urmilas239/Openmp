@@ -285,7 +285,7 @@ int main( int argc, char **argv )
 
         }
 
-        if(1)
+        if(0)
         {
             int size;
             int send_count=0;
@@ -323,6 +323,7 @@ int main( int argc, char **argv )
 
             }
             //  printf("RANK %d  -----After Sending particles sizes-----------------\n", rank);
+            MPI_Gather(&send_count, 1, MPI_INT, receive_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 
 
