@@ -27,6 +27,8 @@ typedef struct
 } particle_t;
 
 
+typedef std::vector<particle_t> bin_t;
+
 typedef struct 
 {
 	int bin_id;
@@ -91,6 +93,12 @@ std::vector<int> get_boundary_bins_for_curr_process(std::vector<int > &process_b
 void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std::vector<int> > &bin_map, int** partition_offset, int** partition_sizes);
 void remove_particle_from_bin(int old_bin_index, int new_bin_index, int particle_index, std::vector<std::vector<int> > &bin_map );
 void get_neighbors_in_other_process(int bin_index, int current_rank, std::vector<std::vector<int> > &neighbor_bins , std::vector<int> &bin_process_map, std::vector<int> &outside_neighbors);
+
+
+void set_bin_count_mpi(double &bin_size, int &total_bin_count_x);
+void build_bins(std::vector<bin_t>& bins, particle_t* particles, int total_bin_count_x, int n);
+void build_particle(particle_t& particle, std::vector<bin_t>& bins, int total_bin_count_x);
+int compute_bin_index_from_xy(double x, double y, int col);
 
 
 //

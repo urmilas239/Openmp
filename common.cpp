@@ -65,6 +65,68 @@ std::vector<std::vector<int> > initialize_bin_vector()
 
 
 
+//Divides bins(hence particles) across process
+std::vector<int > assign_bins_to_current_process_mpi11(int num_of_processes, int current_process, std::vector<std::vector<int> > &bin_map, std::vector<int> &bin_process_map, int &num_of_particles_in_curr_process)
+{
+    //std::cout<<"RANK: "<<current_process<<" assign_bins_to_current_process_mpi START::: "<<std::endl;
+    //total bins
+    int bin_count = bin_map.size();
+    int num_of_particles_in_curr_process_local = 0;
+
+
+
+    //int num_bins_per_process =  ceil(bin_count/num_of_processes);
+    int num_bins_per_process =  ((bin_count + num_of_processes - 1) / num_of_processes);
+    std::vector<int> process_bins;
+    int assigned_bin_count = 0;
+    int current_process_id = 0;
+    int total_particles = 0;
+    //std::cout<<"bin_count::: "<<bin_count<<" ,num_bins_per_process ::: "<< num_bins_per_process<< " , num_of_processes::: "<< num_of_processes<< std::endl;
+
+    for(int bin_idex =(num_bins_per_process*current_process); bin_idex < bin_count; bin_idex++)
+    {
+        //std::cout<<" current_process_id ::: "<< current_process_id<<std::endl;
+        bin_process_map.push_back(current_process_id);
+        total_particles += bin_map.at(bin_idex).size();
+        if(current_process_id == current_process)
+        {
+            process_bins.push_back(bin_idex);
+            num_of_particles_in_curr_process += bin_map.at(bin_idex).size();
+           // printf("RANK111 %d assign_bins_to_current_process_mpi :: bin_map.at(bin_idex).size() %d \n",current_process,  bin_map.at(bin_idex).size());
+
+          // printf("RANK111 %d assign_bins_to_current_process_mpi ::total_particles %d \n",current_process, total_particles);
+        }
+
+        assigned_bin_count++;
+        //std::cout<<"assigned_bin_count ::: "<< assigned_bin_count<<std::endl;
+        if(assigned_bin_count >= num_bins_per_process)
+        {
+
+            //printf("RANK %d assigned %d bins to Process %d\n",current_process, assigned_bin_count, current_process_id);
+          // printf("RANK %d assigned %d particles to Process %d\n",current_process, num_of_particles_in_curr_process_local, current_process_id);
+
+            assigned_bin_count = 0;
+            current_process_id++;
+            num_of_particles_in_curr_process=0;
+        }
+
+    }
+
+
+   // printf("RANK %d assigned %d bins to Process %d\n",current_process, assigned_bin_count, current_process_id);
+    //printf("RANK %d assigned %d particles to Process %d\n",current_process, num_of_particles_in_curr_process_local, current_process_id);
+
+
+  //  printf("RANK %d  assign_bins_to_current_process_mpi ::process_bins size %d \n", current_process, process_bins.size());
+//
+    //printf("RANK %d  assign_bins_to_current_process_mpi ::num_of_particles_in_curr_process %d \n", current_process, num_of_particles_in_curr_process);
+   // printf("RANK %d  assign_bins_to_current_process_mpi ::total_particles %d \n", current_process, total_particles);
+
+    // process_bins.push_back(num_of_particles_in_curr_process);
+    //std::cout<<"RANK: "<<current_process<<" assign_bins_to_current_process_mpi END::: "<<std::endl;
+    return process_bins;
+}
+
 
 
 
@@ -556,10 +618,54 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
  }
 
 
+ void set_bin_count_mpi(double &bin_size, int &total_bin_count_x)
+ {
+
+    bin_size = cutoff;
+    total_bin_count_x = int(size / bin_size) + 1;
+
+ }
+
+
+ void build_bins(std::vector<bin_t>& bins, particle_t* particles, int total_bin_count_x, int n)
+ {
+
+
+     bins.resize(total_bin_count_x * total_bin_count_x);
+
+     for (int i = 0; i < n; i++)
+     {
+         int x = int(particles[i].x / size);
+         int y = int(particles[i].y / size);
+         bins[x*total_bin_count_x + y].push_back(particles[i]);
+     }
+ }
+
+
+ void build_particle(particle_t& particle, std::vector<bin_t>& bins, int total_bin_count_x)
+ {
+     int x = particle.x / size;
+     int y = particle.y / size;
+     //printf("bin %d. x %d. y %d", x*bin_count + y, x, y);
+     //fflush(stdout);
+     //printf(", size %ld.\n", bins[x*bin_count + y].size());
+     bins[x*total_bin_count_x + y].push_back(particle);
+ }
+
+
  int compute_bin_index_from_xy(double x, double y)
  {
     
     int bin_index = (floor(x/bin_size)*num_of_bins_y)+floor(y /bin_size);
+    return bin_index;
+
+ }
+
+
+ int compute_bin_index_from_xy(double x, double y, int col)
+ {
+
+    int bin_index = (floor(x/bin_size)*col)+floor(y /bin_size);
     return bin_index;
 
  }
