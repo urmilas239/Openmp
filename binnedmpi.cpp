@@ -17,6 +17,12 @@ using std::vector;
 double bin_size1, grid_size;
 int bin_count;
 
+
+inline bool cmpf(double A, double B, double epsilon = 0.00000005f)
+{
+return (fabs(A - B) < epsilon);
+}
+
 inline void build_bins(vector<bin_t>& bins, particle_t* particles, int n)
 {
     grid_size = sqrt(n * _density);
@@ -229,32 +235,43 @@ int main( int argc, char **argv )
         bin_t local_move;
         std::vector<std::vector<particle_t>> remote_move(n_proc);
 
-        for (int i = my_bins_start; i < my_bins_end; ++i) {
-            for (int j = 0; j < bin_count; ++j) {
-                bin_t& bin = bins[i * bin_count + j];
-                int tail = bin.size(), k = 0;
-                for (; k < tail; ) {
+        for (int i = my_bins_start; i < my_bins_end; ++i)
+        {
+            for (int j = 0; j < bin_count; ++j)
+            {
+                std::vector<particle_t>& bin = bins.at(i * bin_count + j);
+                int b_size = bin.size();
+                int k = 0;
+                for (k=0; k < b_size; ) {
                     particle_t pt = bin[k];
                     move(bin[k]);
 
                     int x = int(bin[k].x / bin_size1);
                     int y = int(bin[k].y / bin_size1);
 
+                    //If the new bin id is in the current process
                     if (my_bins_start <= x && x < my_bins_end) {
 
+                        //If the new bin id same as current bin id
                         if (x == i && y == j)
-                            ++k;
+                        {
+                            //No change dont do anything
+                             k++;
+                        }
+
                         else {
+                            //moved locally in process
                             local_move.push_back(bin[k]);
-                            bin[k] = bin[--tail];
+
+                            //Put last bin in at k and resize bin later to remove bin[k]
+                            bin[k] = bin[--b_size];
                         }
                     } else {
-                        //remote_move.push_back(bin[k]);
-                        //int who = x / x_bins_per_proc;
-                        //
+
+                        //Which process has the particle moved to?
                         int proc_to_update = which_process(x,x_bins_per_proc, n_proc);
                        // printf("RANK %d, proc_to_update %d , x: %d, x_bins_per_proc:%d, n_proc:%d::\n", rank, proc_to_update, x,  x_bins_per_proc, n_proc);
-                        remote_move.at(proc_to_update).push_back(bin[k]);
+                        remote_move.at(proc_to_update).push_back(pt);
                         //get neighbors of bin, if neighbors bellong to different bin update them.
 
                         get_neighbors(x,y, current_neighbors);
@@ -262,11 +279,13 @@ int main( int argc, char **argv )
                         {
                             if(proc_to_update!= which_process(current_neighbors.at(n_index), bin_count,n_proc) )
                             {
-                                remote_move.at(which_process(current_neighbors.at(n_index), bin_count,n_proc)).push_back(bin[k]);
+                                remote_move.at(which_process(current_neighbors.at(n_index), bin_count,n_proc)).push_back(pt);
                             }
                         }
                         current_neighbors.clear();
-                        bin[k] = bin[--tail];
+
+                        //remove the particle that has moved.
+                        bin[k] = bin[--b_size];
                     }
                 }
                 bin.resize(k);
@@ -376,7 +395,7 @@ int main( int argc, char **argv )
                                // receive_updated_particles.erase(receive_updated_particles.begin(), receive_updated_particles.end());
                                 if(receive_updated_particles.size() < size)
                                 {
-                                   receive_updated_particles.resize(receive_size[i]);
+                                   receive_updated_particles.resize(receive_size[i]+1);
                                 }
 
                                 std::vector<particle_t> receive_updated_particles1(size);
@@ -385,7 +404,7 @@ int main( int argc, char **argv )
                                 // printf("RANK %d , receive_size[i]::: %d , receive_updated_particles:: %d\n", rank, size,receive_updated_particles.size() );
                                 for(int p_index = 0; p_index <receive_updated_particles.size(); p_index++)
                                 {
-                                    particle_t &pt = receive_updated_particles.at(p_index);
+                                    particle_t pt = receive_updated_particles.at(p_index);
 
                                    // int old_bin_index = compute_bin_index_from_xy(pt.x, pt.y,bin_count);
 
@@ -395,22 +414,25 @@ int main( int argc, char **argv )
 
                                     //printf("old_bin_index::: %d \n",old_bin_index);
 
-                                    /* std::vector<particle_t> &bin = bins.at(old_bin_index);
+                                      std::vector<particle_t> &bin = bins.at(old_bin_index);
                                       int b_size = bin.size();
-                                      int g ;
-                                      for(g =0; g<b_size;)
+                                      //int g ;
+                                      for(int g =0; g<b_size;g++)
                                       {
-                                        if((double)bin[g].x == (double)pt.x && (double)bin[g].y == (double)pt.y)
+                                        //if((double)bin[g].x == (double)pt.x && (double)bin[g].y == (double)pt.y)
+                                        if(cmpf(bin[g].x, pt.x) && cmpf(bin[g].y, pt.y) )
                                         {
-                                            bin[g] =bin[--b_size];
+                                            //bin[g] = bin[b_size - 1];
+                                            //printf(":::MATCH FOUND:::::");
                                             bin.erase(bin.begin()+g);
-                                            g++;
+                                           break;
 
                                         }
+
                                       }
-                                      bin.resize(g);
-                                      move(pt);*/
-                                    // bin_particle(pt, bins);
+
+                                     //move(pt);
+                                    //bin_particle(pt, bins);
                                    // particles[(int) pt.index] = pt;
                                 }
 
@@ -422,10 +444,6 @@ int main( int argc, char **argv )
 
                         }
         }
-
-        //bin_particles(particles, bins);
-        //bins.clear();
-        //build_bins(bins, particles, n);
 
     }
     simulation_time = read_timer( ) - simulation_time;
