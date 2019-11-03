@@ -132,7 +132,7 @@ int main( int argc, char **argv )
     bin_particles( n, particles , bin_map);
     number_of_interacting_particles = 0;
     process_bins=assign_bins_to_current_process_mpi(n_proc, rank, bin_map, bin_process_map, number_of_interacting_particles);
-    printf("Rank %d : number_of_interacting_particles : %d\n", rank, number_of_interacting_particles);
+    //printf("Rank %d : number_of_interacting_particles : %d\n", rank, number_of_interacting_particles);
     //number_of_interacting_particles = process_bins.size();
      //printf("Rank %d : number_of_interacting_particles : %d\n", rank, number_of_interacting_particles);
     //border_neighbors = get_boundary_bins_for_curr_process(process_bins, neighbor_bins);
@@ -162,7 +162,7 @@ int main( int argc, char **argv )
 
     for( int step = 0; step < NSTEPS; step++ )
     {
-       printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
+     //  printf( ":::::::::::::IN TIME STEP::::::::::::::::::::::::::::::::::::: %d\n" , step);
 
         particle_index = 0;
         for(int i=0;i<process_bins.size();i++)
@@ -211,29 +211,32 @@ int main( int argc, char **argv )
             particle_list_collect.clear();
 
            // std::cout<<"particle_index:: "<<particle_index<<"  ,number_of_interacting_particles::"<<number_of_interacting_particles<<std::endl;
-            if( find_option( argc, argv, "-no" ) == -1 )
-            {
-
-            // MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-            // MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
-             //MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
-
-
-              if (rank == 0){
-                //
-                // Computing statistical data
-                //
-                if (rnavg) {
-                  absavg +=  rdavg/rnavg;
-                  nabsavg++;
-                }
-                if (rdmin < absmin) absmin = rdmin;
-              }
-            }
 
 
 
      }//apply force ends
+
+
+        if( find_option( argc, argv, "-no" ) == -1 )
+        {
+
+         MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+         MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+         MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
+
+
+          if (rank == 0){
+            //
+            // Computing statistical data
+            //
+            if (rnavg) {
+              absavg +=  rdavg/rnavg;
+              nabsavg++;
+            }
+            if (rdmin < absmin) absmin = rdmin;
+          }
+        }
+
 
         //particles_updates_after_move.clear();
         for( int i = 0; i < n; i++ )
@@ -278,7 +281,7 @@ int main( int argc, char **argv )
                     std::vector<int>::iterator it = processes_to_contact.begin();
                     if(particles_updates_after_move.empty())
                     {
-                        printf("Rank %d: particles_updates_after_move size: %d\n", rank, 0);
+                        //printf("Rank %d: particles_updates_after_move size: %d\n", rank, 0);
 
                     }
                     else {
@@ -331,7 +334,7 @@ int main( int argc, char **argv )
                        size = particles_updates_after_move.at(i).size();
 
                     }
-                    printf("From %d -> to %d, Value sent::: %d\n", rank, i, size);
+                   // printf("From %d -> to %d, Value sent::: %d\n", rank, i, size);
                    // MPI_Isend(&size, 1, MPI_INT, i, rank*10, MPI_COMM_WORLD, &request);
                      MPI_Send(&size, 1, MPI_INT, i, rank*10, MPI_COMM_WORLD);
                     send_count++;
@@ -354,14 +357,14 @@ int main( int argc, char **argv )
                    // MPI_Irecv(&receive_size[i], 1, MPI_INT, i, i*10, MPI_COMM_WORLD, &request);
                      MPI_Recv(&receive_size[i], 1, MPI_INT, i, i*10, MPI_COMM_WORLD, &status);
                    // printf("in %d recieve_d value:: %d\n", rank,receive_size[i]);
-                    printf("From %d -> to %d, Value Received::: %d\n\n\n", i, rank,receive_size[i]);
+                    //printf("From %d -> to %d, Value Received::: %d\n\n\n", i, rank,receive_size[i]);
 
                 }
 
             }
-              printf("RANK %d  -----After Sending particles sizes-----------------\n", rank);
+            //  printf("RANK %d  -----After Sending particles sizes-----------------\n", rank);
 
-            printf("recieve_count:: %d\n", send_count);
+           // printf("recieve_count:: %d\n", send_count);
             //Send updated particles only to relevant processes
 
             //Sending sizes End
@@ -426,7 +429,7 @@ int main( int argc, char **argv )
 
             }
 
-         printf("-----After Sending particles-----------------\n");
+         //printf("-----After Sending particles-----------------\n");
         }
 
  } //NSTEPS FOR LOOP ends

@@ -68,7 +68,7 @@ std::vector<std::vector<int> > initialize_bin_vector()
 //Divides bins(hence particles) across process
 std::vector<int > assign_bins_to_current_process_mpi11(int num_of_processes, int current_process, std::vector<std::vector<int> > bin_map, std::vector<int> &bin_process_map, int &num_of_particles_in_curr_process)
 {
-    std::cout<<"RANK: "<<current_process<<" assign_bins_to_current_process_mpi START::: "<<std::endl;
+    //std::cout<<"RANK: "<<current_process<<" assign_bins_to_current_process_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
     int num_of_particles_in_curr_process_local = 0;
@@ -102,8 +102,8 @@ std::vector<int > assign_bins_to_current_process_mpi11(int num_of_processes, int
         if(assigned_bin_count >= num_bins_per_process)
         {
 
-            printf("RANK %d assigned %d bins to Process %d\n",current_process, assigned_bin_count, current_process_id);
-           printf("RANK %d assigned %d particles to Process %d\n",current_process, num_of_particles_in_curr_process_local, current_process_id);
+            //printf("RANK %d assigned %d bins to Process %d\n",current_process, assigned_bin_count, current_process_id);
+          // printf("RANK %d assigned %d particles to Process %d\n",current_process, num_of_particles_in_curr_process_local, current_process_id);
 
             assigned_bin_count = 0;
             current_process_id++;
@@ -113,17 +113,17 @@ std::vector<int > assign_bins_to_current_process_mpi11(int num_of_processes, int
     }
 
 
-    printf("RANK %d assigned %d bins to Process %d\n",current_process, assigned_bin_count, current_process_id);
-    printf("RANK %d assigned %d particles to Process %d\n",current_process, num_of_particles_in_curr_process_local, current_process_id);
+   // printf("RANK %d assigned %d bins to Process %d\n",current_process, assigned_bin_count, current_process_id);
+    //printf("RANK %d assigned %d particles to Process %d\n",current_process, num_of_particles_in_curr_process_local, current_process_id);
 
 
-    printf("RANK %d  assign_bins_to_current_process_mpi ::process_bins size %d \n", current_process, process_bins.size());
-
-    printf("RANK %d  assign_bins_to_current_process_mpi ::num_of_particles_in_curr_process %d \n", current_process, num_of_particles_in_curr_process);
-    printf("RANK %d  assign_bins_to_current_process_mpi ::total_particles %d \n", current_process, total_particles);
+  //  printf("RANK %d  assign_bins_to_current_process_mpi ::process_bins size %d \n", current_process, process_bins.size());
+//
+    //printf("RANK %d  assign_bins_to_current_process_mpi ::num_of_particles_in_curr_process %d \n", current_process, num_of_particles_in_curr_process);
+   // printf("RANK %d  assign_bins_to_current_process_mpi ::total_particles %d \n", current_process, total_particles);
 
     // process_bins.push_back(num_of_particles_in_curr_process);
-    std::cout<<"RANK: "<<current_process<<" assign_bins_to_current_process_mpi END::: "<<std::endl;
+    //std::cout<<"RANK: "<<current_process<<" assign_bins_to_current_process_mpi END::: "<<std::endl;
     return process_bins;
 }
 
@@ -257,7 +257,7 @@ void get_num_of_particles_in_each_process(int num_of_processes, std::vector<std:
 //Divides bins(hence particles) across process
 std::vector<std::vector<int> > assign_bins_to_processes_mpi(int num_of_processes, std::vector<std::vector<int> > bin_map)
 {
-     std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
+     //std::cout<<"assign_bins_to_processes_mpi START::: "<<std::endl;
     //total bins
     int bin_count = bin_map.size();
 
@@ -305,7 +305,7 @@ void form_particles_array_for_MPI(std::vector<int>  &bin_ids,
     int bin_id;
     int particle_index = 0;
     int particle_neighbor_index = 0;
-    int neighbor_index = 0;
+
 
     std::vector<int>  particles_in_neighbor;
 
@@ -607,13 +607,13 @@ std::vector<std::vector<int> > initialize_neighbor_bins()
     bin_size = cutoff;
     //std::cout<< "bin_size::" <<bin_size<<std::endl;
     num_of_bins_x = ceil(size/bin_size);
-    std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;
+    //std::cout<< "num_of_bins_x::" <<num_of_bins_x<<std::endl;
     num_of_bins_y = num_of_bins_x;
-    std::cout<< "num_of_bins_y::" <<num_of_bins_y<<std::endl;
+    //std::cout<< "num_of_bins_y::" <<num_of_bins_y<<std::endl;
     total_bin_count = num_of_bins_x*num_of_bins_y;
-    std::cout<< "total_bin_count::" <<total_bin_count<<std::endl;
+    //std::cout<< "total_bin_count::" <<total_bin_count<<std::endl;
     bin_density = n/total_bin_count;
-    std::cout<< "bin_density::" <<bin_density<<std::endl;
+    //std::cout<< "bin_density::" <<bin_density<<std::endl;
     
  }
 
