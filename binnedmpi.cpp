@@ -444,8 +444,8 @@ int main( int argc, char **argv )
                                           //if(cmpf(bin[g].x, pt.x) && cmpf(bin[g].y, pt.y) )
                                           {
 
-                                              printf("bin[g]::: %.4lf %.4lf \n ",bin[g].x, bin[g].y);
-                                               printf("pt::: %.4lf %.4lf \n ",pt.x, pt.y);
+                                              //printf("bin[g]::: %.4lf %.4lf \n ",bin[g].x, bin[g].y);
+                                               //printf("pt::: %.4lf %.4lf \n ",pt.x, pt.y);
 
                                               //particle found and removed
                                               bin.erase(bin.begin()+g);
