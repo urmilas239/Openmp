@@ -1,18 +1,15 @@
 #include <mpi.h>
 #include <stdlib.h>
 #include <stdio.h>
-
 #include <vector>
 #include <cmath>
-#include <signal.h>
-#include <unistd.h>
 #include "common.h"
 
 using std::vector;
 
-
-#define _cutoff 0.01    //Value copied from common.cpp
-#define _density 0.0005
+//same as those defined in commom.cpp - defined here to use in main.
+#define cutoff 0.01
+#define density 0.0005
 
 double bin_size1, grid_size;
 int bin_count;
@@ -21,56 +18,6 @@ int bin_count;
 inline bool cmpf(double A, double B, double epsilon = 0.00005f)
 {
 return (fabs(A - B) < epsilon);
-}
-
-inline void build_bins(vector<bin_t>& bins, particle_t* particles, int n)
-{
-    grid_size = sqrt(n * _density);
-    bin_size1 = _cutoff;
-    bin_count = int(grid_size / bin_size1) + 1; // Should be around sqrt(N/2)
-
-    // printf("Grid Size: %.4lf\n", grid_size);
-    // printf("Number of Bins: %d*%d\n", bin_count, bin_count);
-      printf("bin_count: %d\n", bin_count);
-    // printf("Bin Size: %.2lf\n", bin_size);
-    // Increase\Decrease bin_count to be something like 2^k?
-
-    bins.resize(bin_count * bin_count);
-
-    for (int i = 0; i < n; i++)
-    {
-        int x = int(particles[i].x / bin_size1);
-        int y = int(particles[i].y / bin_size1);
-        bins.at(x*bin_count + y).push_back(particles[i]);
-    }
-}
-
-
-
-void bin_particle(particle_t& particle, vector<bin_t>& bins)
-{
-
-}
-
-
-inline void get_neighbors(int i, int j, vector<int>& neighbors)
-{
-    neighbors.erase(neighbors.begin(), neighbors.end());
-   // printf("get_neighbors start");
-    int neighbor_count = 0;
-    for (int dx = -1; dx <= 1; dx++) {
-        for (int dy = -1; dy <= 1; dy++) {
-            if (dx == 0 && dy == 0)
-                continue;
-            if (i + dx >= 0 && i + dx < bin_count && j + dy >= 0 && j + dy < bin_count) {
-                int index = (i + dx) * bin_count + j + dy;
-                neighbors.push_back((i + dx));
-                neighbor_count++;
-            }
-        }
-    }
-    //neighbors.resize(8);
-    //printf("get_neighbors end");
 }
 
 
@@ -91,6 +38,32 @@ inline int which_process(int bin_id, int x_bins_per_proc, int n_proc )
    // printf("which_process y %d:: process_id::%d\n",y, process_id);
     return y;
 }
+
+
+
+inline void get_neighbors(int i, int j, vector<int>& neighbors)
+{
+    neighbors.erase(neighbors.begin(), neighbors.end());
+   // printf("get_neighbors start");
+    int neighbor_count = 0;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            if (dx == 0 && dy == 0)
+                continue;
+            if (i + dx >= 0 && i + dx < bin_count && j + dy >= 0 && j + dy < bin_count) {
+                int index = (i + dx) * bin_count + j + dy;
+                neighbors.push_back((i + dx));
+                neighbor_count++;
+            }
+        }
+    }
+
+}
+
+
+
+
+
 
 //
 //  benchmarking program
@@ -143,44 +116,54 @@ int main( int argc, char **argv )
     MPI_Type_contiguous( 6, MPI_DOUBLE, &PARTICLE );
     MPI_Type_commit( &PARTICLE );
 
-    //
-    //  initialize and distribute the particles (that's fine to leave it unoptimized)
-    //
+
     set_size( n );
     if( rank == 0 )
+    {
         init_particles( n, particles );
+    }
+
 
     MPI_Bcast(particles, n, PARTICLE, 0, MPI_COMM_WORLD);
 
-    vector<int> current_neighbors(8);
+     vector<int> current_neighbors(8);
 
-    vector<std::vector<particle_t>> bins;
+     vector<std::vector<particle_t>> bins;
      std::vector<particle_t> receive_updated_particles;
      particle_t pt;
 
-    build_bins(bins, particles, n);
+
+     //Bin particles
+     grid_size = sqrt(n * density);
+     bin_size1 = cutoff;
+     bin_count = int(grid_size / bin_size1) + 1;
+     bins.resize(bin_count * bin_count);
+
+     for (int i = 0; i < n; i++)
+     {
+         int x = int(particles[i].x / bin_size1);
+         int y = int(particles[i].y / bin_size1);
+         bins.at(x*bin_count + y).push_back(particles[i]);
+     }
 
 
 
 
     int x_bins_per_proc = bin_count / n_proc;
 
-    // although each worker has all particles, we only access particles within
-    // my_bins_start, my_bins_end.
 
-    int my_bins_start = x_bins_per_proc * rank;
-    int my_bins_end = x_bins_per_proc * (rank + 1);
+
+    int bins_start_index = x_bins_per_proc * rank;
+    int bins_end_index = x_bins_per_proc * (rank + 1);
 
     if (rank == n_proc - 1)
-        my_bins_end = bin_count;
+        bins_end_index = bin_count;
 
 
 
      int *receive_size = (int*)malloc(n_proc*sizeof (int));
-    // printf("worker %d: from %d to %d.\n", rank, my_bins_start, my_bins_end);
-    //
-    //  simulate a number of time steps
-    //
+
+
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -188,33 +171,35 @@ int main( int argc, char **argv )
         dmin = 1.0;
         davg = 0.0;
 
-        // if( find_option(argc, argv, "-no" ) == -1 )
-        //     if( fsave && (step%SAVEFREQ) == 0 )
-        //         save( fsave, n, particles );
 
-        // compute local forces
-        for (int i = my_bins_start; i < my_bins_end; ++i) {
-            for (int j = 0; j < bin_count; ++j) {
-                bin_t& vec = bins[i * bin_count + j];
 
-                for (int k = 0; k < vec.size(); k++)
-                    vec[k].ax = vec[k].ay = 0;
+        for (int i = bins_start_index; i < bins_end_index; ++i)
+        {
+            for (int j = 0; j < bin_count; ++j)
+            {
+                std::vector<particle_t>& row_bins = bins.at(i * bin_count + j);
 
-                for (int dx = -1; dx <= 1; dx++)   //Search over nearby 8 bins and itself
+                for (int k = 0; k < row_bins.size(); k++)
+
                 {
-                    for (int dy = -1; dy <= 1; dy++)
+                     row_bins[k].ax = row_bins[k].ay = 0;
+                    for (int dx = -1; dx <= 1; dx++)
                     {
-                        if (i + dx >= 0 && i + dx < bin_count && j + dy >= 0 && j + dy < bin_count)
+                        for (int dy = -1; dy <= 1; dy++)
                         {
-                            bin_t& vec2 = bins[(i+dx) * bin_count + j + dy];
-                            for (int k = 0; k < vec.size(); k++)
-                                for (int l = 0; l < vec2.size(); l++)
-                                    apply_force( vec[k], vec2[l], &dmin, &davg, &navg);
-                        }
-                    }
-                }
-            }
-        }
+                            //check for boundaries
+                            if (i + dx >= 0 && i + dx < bin_count && j + dy >= 0 && j + dy < bin_count)
+                            {
+                                std::vector<particle_t>& surrounding_particles = bins[(i+dx) * bin_count + j + dy];
+
+                                    for (int l = 0; l < surrounding_particles.size(); l++)
+                                        apply_force( row_bins[k], surrounding_particles[l], &dmin, &davg, &navg);
+                            }
+                        }//y neighbors ends
+                    }//x neighbors
+             }//k ends
+            }//j ends
+        }//i ends
 
         if (find_option( argc, argv, "-no" ) == -1) {
           MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
@@ -231,10 +216,10 @@ int main( int argc, char **argv )
         }
 
         // move, but not rebin
-        bin_t local_move;
+        std::vector<particle_t> local_move;
         std::vector<std::vector<particle_t>> remote_move(n_proc);
 
-        for (int i = my_bins_start; i < my_bins_end; ++i)
+        for (int i = bins_start_index; i < bins_end_index; ++i)
         {
             for (int j = 0; j < bin_count; ++j)
             {
@@ -266,7 +251,7 @@ int main( int argc, char **argv )
                     int y = int(bin[k].y / bin_size1);
 
                     //If the new bin id is in the current process
-                    if (my_bins_start <= x && x < my_bins_end) {
+                    if (bins_start_index <= x && x < bins_end_index) {
 
                         //If the new bin id same as current bin id
                         if (x == i && y == j)
