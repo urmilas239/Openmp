@@ -63,11 +63,6 @@ inline void get_neighbors(int i, int j, vector<int>& neighbors)
 
 
 
-
-
-//
-//  benchmarking program
-//
 int main( int argc, char **argv )
 {
     //signal(SIGSEGV, sigsegv);
@@ -146,7 +141,7 @@ int main( int argc, char **argv )
          bins.at(x*bin_count + y).push_back(particles[i]);
      }
 
-
+    free(particles);
 
 
     int x_bins_per_proc = bin_count / n_proc;
@@ -172,7 +167,7 @@ int main( int argc, char **argv )
         davg = 0.0;
 
 
-
+        //Loop to apply force
         for (int i = bins_start_index; i < bins_end_index; ++i)
         {
             for (int j = 0; j < bin_count; ++j)
@@ -201,6 +196,10 @@ int main( int argc, char **argv )
             }//j ends
         }//i ends
 
+        //Loop to apply force done
+
+
+
         if (find_option( argc, argv, "-no" ) == -1) {
           MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
           MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
@@ -215,9 +214,9 @@ int main( int argc, char **argv )
           }
         }
 
-        // move, but not rebin
-        std::vector<particle_t> local_move;
-        std::vector<std::vector<particle_t>> remote_move(n_proc);
+
+        std::vector<particle_t> update_in_current_proc;
+        std::vector<std::vector<particle_t>> update_outside_proc(n_proc);
 
         for (int i = bins_start_index; i < bins_end_index; ++i)
         {
@@ -228,6 +227,7 @@ int main( int argc, char **argv )
                 int k = 0;
                 int k_temp = 0;
                 for (k=0; k < b_size; ) {
+                    //index to identify the particle in the remote process
                     k_temp++;
                     pt = bin[k];
                     /*memcpy(pt, bin[k], sizeof (particle_t));
@@ -262,7 +262,7 @@ int main( int argc, char **argv )
 
                         else {
                             //moved locally in process
-                            local_move.push_back(bin[k]);
+                            update_in_current_proc.push_back(bin[k]);
 
                             //Put last bin in at k and resize bin later to remove bin[k]
                             bin[k] = bin[--b_size];
@@ -272,7 +272,7 @@ int main( int argc, char **argv )
                         //Which process has the particle moved to?
                         int proc_to_update = which_process(x,x_bins_per_proc, n_proc);
                        // printf("RANK %d, proc_to_update %d , x: %d, x_bins_per_proc:%d, n_proc:%d::\n", rank, proc_to_update, x,  x_bins_per_proc, n_proc);
-                        remote_move.at(proc_to_update).push_back( bin[k]);
+                        update_outside_proc.at(proc_to_update).push_back( bin[k]);
                         //get neighbors of bin, if neighbors bellong to different bin update them.
 
                         get_neighbors(x,y, current_neighbors);
@@ -280,7 +280,7 @@ int main( int argc, char **argv )
                         {
                             if(proc_to_update!= which_process(current_neighbors.at(n_index), bin_count,n_proc) )
                             {
-                                remote_move.at(which_process(current_neighbors.at(n_index), bin_count,n_proc)).push_back( bin[k]);
+                                update_outside_proc.at(which_process(current_neighbors.at(n_index), bin_count,n_proc)).push_back( bin[k]);
                             }
                         }
                         current_neighbors.clear();
@@ -293,24 +293,24 @@ int main( int argc, char **argv )
             }
         }
             //printf("Moving particles %d::", rank);
-        for (int i = 0; i < local_move.size(); ++i) {
+        for (int i = 0; i < update_in_current_proc.size(); ++i) {
 
-            int x = local_move[i].x / bin_size1;
-            int y =  local_move[i].y / bin_size1;
-            bins.at(x*bin_count + y).push_back( local_move[i]);
+            int x = update_in_current_proc[i].x / bin_size1;
+            int y =  update_in_current_proc[i].y / bin_size1;
+            bins.at(x*bin_count + y).push_back( update_in_current_proc[i]);
 
         }
 
         if(1)
         {
             int size;
-        for (int i = 0; i < remote_move.size(); ++i) {
+        for (int i = 0; i < update_outside_proc.size(); ++i) {
            if(i != rank)
             {
                  size = 0;
-                if(!(remote_move.at(i).empty() ))
+                if(!(update_outside_proc.at(i).empty() ))
                 {
-                   size = remote_move.at(i).size();
+                   size = update_outside_proc.at(i).size();
 
                 }
               //  printf("From %d -> to %d, Value sent::: %d\n", rank, i, size);
@@ -358,12 +358,12 @@ int main( int argc, char **argv )
                         {
                             if(i != rank)
                             {
-                                if(!(remote_move.at(i).empty()) && remote_move.at(i).size()>0)
+                                if(!(update_outside_proc.at(i).empty()) && update_outside_proc.at(i).size()>0)
                                 {
-                                   size = remote_move.at(i).size();
+                                   size = update_outside_proc.at(i).size();
                                     //MPI_Isend(&particles_updates_after_move, particles_updates_after_move.size(), PARTICLE, i, rank*100, MPI_COMM_WORLD, &request);
-                                   MPI_Send(remote_move.at(i).data(), size, PARTICLE, i, rank*100, MPI_COMM_WORLD);
-                                   remote_move.at(i).erase(remote_move.at(i).begin(), remote_move.at(i).end());
+                                   MPI_Send(update_outside_proc.at(i).data(), size, PARTICLE, i, rank*100, MPI_COMM_WORLD);
+                                   update_outside_proc.at(i).erase(update_outside_proc.at(i).begin(), update_outside_proc.at(i).end());
                                    //printf("RANK %d: Sent %d particles to %d: \n", rank, size,i);
 
                                 }
